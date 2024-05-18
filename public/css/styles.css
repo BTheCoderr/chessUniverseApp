@@ -1,0 +1,151 @@
+/* public/css/styles.css */
+
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    color: #fff;
+}
+
+/* Chessboard styling */
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 60px);
+    grid-template-rows: repeat(8, 60px);
+    width: 480px;
+    height: 480px;
+    border: 5px solid #333;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+/* Square styling */
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px; /* Suitable size for chess pieces */
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.white {
+    background-color: #aad4e5;
+}
+
+.black {
+    background-color: #678eb3;
+}
+
+.dragging {
+    transform: scale(1.2); /* Scale up the piece while dragging */
+}
+
+.valid-drop {
+    background-color: rgba(0, 255, 0, 0.3); /* Semi-transparent green for valid drop targets */
+}
+
+.highlight {
+    background-color: yellow !important;
+}
+
+/* Button styling */
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Input styling */
+input[type="text"] {
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Moves history styling */
+.moves-history {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.moves-history h2 {
+    margin-bottom: 10px;
+}
+
+.moves-history ul {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.moves-history li {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+    color: #fff;
+}
+
+/* Login form styling */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    color: #fff;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.login-form input {
+    margin: 10px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+.login-form button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.login-form button:hover {
+    background-color: #555;
+}

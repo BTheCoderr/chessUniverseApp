@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chess App</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div id="chessboard" class="chessboard"></div>
+    <div class="controls">
+        <button id="resetButton">Reset Game</button>
+        <button id="saveButton">Save Game</button>
+        <input type="text" id="gameId" placeholder="Enter Game ID">
+        <button id="loadButton">Load Game</button>
+    </div>
+    <div id="movesHistory" class="moves-history">
+        <h2>Moves History</h2>
+        <ul id="movesList"></ul>
+    </div>
+    <!-- Include socket.io client script -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/chess.js"></script>
+</body>
+</html>
