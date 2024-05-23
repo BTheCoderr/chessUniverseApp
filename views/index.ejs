@@ -3,30 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chess App</title>
+    <title>Chess Game</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <div id="chessboard" class="chessboard"></div>
-    <div class="controls">
-        <button id="resetButton">Reset Game</button>
-        <button id="saveButton">Save Game</button>
-        <input type="text" id="gameId" placeholder="Enter Game ID">
-        <button id="loadButton">Load Game</button>
-    </div>
-    <div id="movesHistory" class="moves-history">
-        <h2>Moves History</h2>
-        <ul id="movesList"></ul>
-    </div>
-    <div class="timer">
-        <span id="timer">10:00</span>
-    </div>
-    <div class="wager">
-        <form id="wagerForm">
-            <input type="number" id="wagerAmount" placeholder="Enter wager amount" required>
-            <button type="submit">Place Wager</button>
-        </form>
-        <div id="wagerStatus"></div>
+    <div class="game-container">
+        <!-- Chessboard -->
+        <div id="chessboard" class="chessboard"></div>
+        <!-- Game Controls -->
+        <div class="controls">
+            <button id="resetButton">Reset Game</button>
+            <button id="saveButton">Save Game</button>
+            <button id="loadButton">Load Game</button>
+            <input type="text" id="gameId" placeholder="Enter Game ID">
+            <div id="wagerForm">
+                <input type="number" id="wagerAmount" placeholder="Enter Wager Amount">
+                <button type="submit">Place Wager</button>
+            </div>
+            <div id="wagerStatus"></div><!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Chess Game</title>
+                <link rel="stylesheet" href="/css/styles.css">
+            </head>
+            <body>
+                <div class="game-container">
+                    <div id="chessboard" class="chessboard"></div>
+                    <div class="controls">
+                        <button id="resetButton">Reset Game</button>
+                        <button id="saveButton">Save Game</button>
+                        <button id="loadButton">Load Game</button>
+                        <input type="text" id="gameId" placeholder="Enter Game ID">
+                        <div id="wagerForm">
+                            <input type="number" id="wagerAmount" placeholder="Enter Wager Amount">
+                            <button type="submit">Place Wager</button>
+                        </div>
+                        <div id="wagerStatus"></div>
+                    </div>
+                    <div class="moves-history">
+                        <h2>Moves History</h2>
+                        <ul id="movesList"></ul>
+                    </div>
+                    <div id="timer" class="timer"></div>
+                </div>
+                <script src="/socket.io/socket.io.js"></script>
+                <script src="/js/chess.js"></script>
+            </body>
+            </html>
+            
+        </div>
+        <!-- Moves History -->
+        <div class="moves-history">
+            <h2>Moves History</h2>
+            <ul id="movesList"></ul>
+        </div>
+        <!-- Timer -->
+        <div id="timer" class="timer"></div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/chess.js"></script>

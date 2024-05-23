@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="settings-container">
+        <h2>Game Settings</h2>
+        <form id="settingsForm">
+            <div>
+                <label for="timerEnabled">Enable Timer:</label>
+                <input type="checkbox" id="timerEnabled" name="timerEnabled">
+            </div>
+            <div id="timerSettings" style="display: none;">
+                <label for="timerDuration">Timer Duration (minutes):</label>
+                <input type="number" id="timerDuration" name="timerDuration" value="10">
+            </div>
+            <button type="submit">Save Settings</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('timerEnabled').addEventListener('change', function() {
+            const timerSettings = document.getElementById('timerSettings');
+            timerSettings.style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('settingsForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const timerEnabled = document.getElementById('timerEnabled').checked;
+            const timerDuration = document.getElementById('timerDuration').value;
+            localStorage.setItem('timerEnabled', timerEnabled);
+            localStorage.setItem('timerDuration', timerDuration);
+            alert('Settings saved!');
+        });
+
+        // Load settings from local storage
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const timerEnabled = JSON.parse(localStorage.getItem('timerEnabled'));
+            const timerDuration = localStorage.getItem('timerDuration');
+
+            document.getElementById('timerEnabled').checked = timerEnabled;
+            if (timerEnabled) {
+                document.getElementById('timerSettings').style.display = 'block';
+                document.getElementById('timerDuration').value = timerDuration;
+            }
+        });
+    </script>
+</body>
+</html>

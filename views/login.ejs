@@ -8,27 +8,24 @@
 </head>
 <body>
     <div class="login-container">
-        <form class="login-form" id="loginForm">
+        <!-- Login Form -->
+        <form class="login-form" action="/login" method="post">
             <h2>Login</h2>
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="password" id="password" placeholder="Password" required>
+            <!-- Display error message if it exists -->
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+            <!-- Username Input -->
+            <input type="text" name="username" placeholder="Username" required>
+            <!-- Password Input -->
+            <input type="password" name="password" placeholder="Password" required>
+            <!-- Login Button -->
             <button type="submit">Login</button>
+            <!-- Register Button -->
+            <button type="button" onclick="window.location.href='/register'">Don't have an account? Register</button>
+            <!-- Guest Play Button -->
+            <button id="guestButton" type="button" onclick="window.location.href='/game'">Play as Guest</button>
         </form>
-        <button id="guestButton">Play as Guest</button>
     </div>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            // Perform login logic here (e.g., send a request to the server)
-            // For now, we'll just redirect to the game page with the username
-            window.location.href = `/game?username=${username}`;
-        });
-
-        document.getElementById('guestButton').addEventListener('click', function() {
-            window.location.href = '/game?username=Guest';
-        });
-    </script>
 </body>
 </html>
