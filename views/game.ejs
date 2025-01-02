@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+
+<div class="game-container">
+    <div class="game-board">
+        <div class="coordinate-labels rank-labels">
+            <% for(let i = 8; i >= 1; i--) { %>
+                <div class="coordinate"><%= i %></div>
+            <% } %>
+        </div>
+        <div class="board-wrapper">
+            <div id="board" class="board"></div>
+        </div>
+        <div class="coordinate-labels file-labels">
+            <% for(let file of 'abcdefgh') { %>
+                <div class="coordinate"><%= file %></div>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <div class="player-info black">
+            <img src="/img/default-avatar.png" class="player-avatar" alt="Black player">
+            <div class="player-details">
+                <span class="username" id="blackUsername">Waiting for opponent...</span>
+                <div class="timer black-timer">10:00</div>
+            </div>
+        </div>
+
+        <div class="game-status" id="gameStatus">
+            <% if (type === 'guest') { %>
+                <div class="guest-info">
+                    Playing as <%= guestUsername %>
+                    <button id="findOpponentBtn" class="btn btn-primary">Find Opponent</button>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="game-controls">
+            <button id="resignBtn" class="btn btn-danger" disabled>Resign</button>
+            <button id="drawBtn" class="btn btn-warning" disabled>Offer Draw</button>
+            <button id="analysisBtn" class="btn btn-info">Analysis</button>
+            <button id="flipBoardBtn" class="btn btn-secondary">Flip Board</button>
+        </div>
+
+        <div class="moves-container">
+            <div class="moves-header">
+                <span>Moves</span>
+                <div class="moves-controls">
+                    <button id="prevMove" class="btn btn-sm btn-outline-secondary" disabled>&lt;</button>
+                    <button id="nextMove" class="btn btn-sm btn-outline-secondary" disabled>&gt;</button>
+                </div>
+            </div>
+            <div class="moves-list" id="movesList"></div>
+        </div>
+
+        <div class="player-info white">
+            <img src="/img/default-avatar.png" class="player-avatar" alt="White player">
+            <div class="player-details">
+                <span class="username" id="whiteUsername"><%= type === 'guest' ? guestUsername : 'Waiting...' %></span>
+                <div class="timer white-timer">10:00</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="analysisPanel" class="analysis-panel hidden">
+        <div class="analysis-controls">
+            <button id="analyzeBtn" class="btn btn-primary">Analyze Position</button>
+            <button id="getBestMoveBtn" class="btn btn-success">Get Best Move</button>
+            <button id="closeAnalysisBtn" class="btn btn-secondary">Close</button>
+        </div>
+        <div class="analysis-info">
+            <div id="evaluation"></div>
+            <div id="bestLine"></div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="gameConfigData" value="<%- JSON.stringify({
+    type,
+    mode,
+    timeControl: { initial: 600 },
+    isGuest: type === 'guest',
+    guestId,
+    guestUsername
+}) %>">
+
+<script>
+    window.gameConfig = JSON.parse(document.getElementById('gameConfigData').value);
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/game.js"></script>
+
+<%- include('partials/footer') %> 

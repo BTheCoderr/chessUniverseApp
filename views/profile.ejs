@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Universe - Profile</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <h1 class="profile-username"><%- username %></h1>
+            <div class="profile-stats">
+                <div class="stat">
+                    <span class="stat-value"><%- stats.elo %></span>
+                    <span class="stat-label">ELO Rating</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value"><%- stats.wins %></span>
+                    <span class="stat-label">Wins</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value"><%- stats.losses %></span>
+                    <span class="stat-label">Losses</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value"><%- stats.draws %></span>
+                    <span class="stat-label">Draws</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game History -->
+        <div class="profile-section">
+            <h2><i class="fas fa-history"></i> Recent Games</h2>
+            <div class="game-history">
+                <% gameHistory.forEach(game => { %>
+                    <div class="game-record">
+                        <div class="game-result <%- game.result %>">
+                            <i class="fas fa-<%- game.result === 'win' ? 'trophy' : (game.result === 'loss' ? 'times' : 'handshake') %>"></i>
+                        </div>
+                        <div class="game-details">
+                            <span class="opponent">vs. <%- game.opponent %></span>
+                            <span class="game-mode"><%- game.mode %></span>
+                            <span class="game-date"><%- game.date %></span>
+                        </div>
+                        <div class="game-actions">
+                            <button class="game-action-btn" onclick="loadGame('<%- game.id %>')">
+                                <i class="fas fa-play"></i> Replay
+                            </button>
+                            <button class="game-action-btn" onclick="analyzeGame('<%- game.id %>')">
+                                <i class="fas fa-chart-line"></i> Analyze
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="profile-section">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            <form class="settings-form" action="/settings/update" method="POST">
+                <div class="settings-group">
+                    <h3>Game Preferences</h3>
+                    <div class="setting-item">
+                        <label>Default Game Mode</label>
+                        <select name="defaultGameMode">
+                            <option value="blitz" <%- settings.defaultGameMode === 'blitz' ? 'selected' : '' %>>Blitz (5 min)</option>
+                            <option value="rapid" <%- settings.defaultGameMode === 'rapid' ? 'selected' : '' %>>Rapid (10 min)</option>
+                            <option value="classical" <%- settings.defaultGameMode === 'classical' ? 'selected' : '' %>>Classical (30 min)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Board Theme</label>
+                        <select name="boardTheme">
+                            <option value="classic" <%- settings.boardTheme === 'classic' ? 'selected' : '' %>>Classic</option>
+                            <option value="wood" <%- settings.boardTheme === 'wood' ? 'selected' : '' %>>Wood</option>
+                            <option value="neon" <%- settings.boardTheme === 'neon' ? 'selected' : '' %>>Neon</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Piece Style</label>
+                        <select name="pieceStyle">
+                            <option value="classic" <%- settings.pieceStyle === 'classic' ? 'selected' : '' %>>Classic</option>
+                            <option value="modern" <%- settings.pieceStyle === 'modern' ? 'selected' : '' %>>Modern</option>
+                            <option value="minimalist" <%- settings.pieceStyle === 'minimalist' ? 'selected' : '' %>>Minimalist</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Communication</h3>
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" name="enableChat" <%- settings.enableChat ? 'checked' : '' %>>
+                            Enable Chat
+                        </label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" name="enableVideo" <%- settings.enableVideo ? 'checked' : '' %>>
+                            Enable Video Calls
+                        </label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" name="enableSound" <%- settings.enableSound ? 'checked' : '' %>>
+                            Enable Sound Effects
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Privacy</h3>
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" name="publicProfile" <%- settings.publicProfile ? 'checked' : '' %>>
+                            Public Profile
+                        </label>
+                    </div>
+                    <div class="setting-item checkbox">
+                        <label>
+                            <input type="checkbox" name="showOnlineStatus" <%- settings.showOnlineStatus ? 'checked' : '' %>>
+                            Show Online Status
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="save-settings-btn">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+            </form>
+        </div>
+
+        <!-- Friends List -->
+        <div class="profile-section">
+            <h2><i class="fas fa-users"></i> Friends</h2>
+            <div class="friends-list">
+                <% friends.forEach(friend => { %>
+                    <div class="friend-item">
+                        <div class="friend-avatar">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="status-indicator <%- friend.online ? 'online' : 'offline' %>"></span>
+                        </div>
+                        <div class="friend-info">
+                            <span class="friend-name"><%- friend.username %></span>
+                            <span class="friend-status"><%- friend.online ? 'Online' : 'Offline' %></span>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="friend-action-btn" onclick="challengeFriend('<%- friend.id %>')">
+                                <i class="fas fa-chess"></i> Challenge
+                            </button>
+                            <button class="friend-action-btn" onclick="spectateGame('<%- friend.id %>')">
+                                <i class="fas fa-eye"></i> Spectate
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+</html> 

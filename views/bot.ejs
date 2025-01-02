@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Against Bots - Chess Universe</title>
+    
+    <!-- Core Dependencies -->
+    <link rel="stylesheet" href="/css/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bot.css">
+    
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/chess.js"></script>
+    <script src="/js/chessboard-1.0.0.min.js"></script>
+    <script src="/js/socket.io.min.js"></script>
+</head>
+<body class="dark-theme">
+    <!-- Game Container -->
+    <div class="game-container">
+        <!-- Left Side Panel -->
+        <div class="side-panel left">
+            <div class="player-info black">
+                <img src="/img/bot-avatar.png" alt="Bot Avatar" class="player-avatar">
+                <div class="player-details">
+                    <div class="player-name">Bot</div>
+                    <div class="player-rating">Rating: 1500</div>
+                </div>
+                <div class="player-timer">10:00</div>
+            </div>
+
+            <div class="eval-bar-container">
+                <div class="eval-bar">
+                    <div class="eval-fill"></div>
+                </div>
+                <div class="eval-score">0.0</div>
+            </div>
+
+            <div class="captured-pieces black">
+                <!-- Captured pieces will be added here -->
+            </div>
+        </div>
+
+        <!-- Center Board Area -->
+        <div class="board-container">
+            <div id="board"></div>
+            
+            <div class="game-controls">
+                <button class="control-btn" id="flipBoardBtn" title="Flip Board">
+                    <i class="fas fa-retweet"></i>
+                </button>
+                <button class="control-btn" id="undoBtn" title="Take Back">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="control-btn" id="newGameBtn" title="New Game">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="control-btn" id="resignBtn" title="Resign">
+                    <i class="fas fa-flag"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Side Panel -->
+        <div class="side-panel right">
+            <div class="player-info white">
+                <img src="/img/user-avatar.png" alt="Player Avatar" class="player-avatar">
+                <div class="player-details">
+                    <div class="player-name">You</div>
+                    <div class="player-rating">Rating: 1200</div>
+                </div>
+                <div class="player-timer">10:00</div>
+            </div>
+
+            <div class="moves-container">
+                <div class="moves-header">
+                    <h3>Moves</h3>
+                    <div class="move-controls">
+                        <button class="move-btn" id="firstMoveBtn">
+                            <i class="fas fa-fast-backward"></i>
+                        </button>
+                        <button class="move-btn" id="prevMoveBtn">
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button class="move-btn" id="nextMoveBtn">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                        <button class="move-btn" id="lastMoveBtn">
+                            <i class="fas fa-fast-forward"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="moves-list" id="movesList"></div>
+            </div>
+
+            <div class="captured-pieces white">
+                <!-- Captured pieces will be added here -->
+            </div>
+
+            <div class="analysis-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="analysisToggle">
+                    <span class="slider round"></span>
+                </label>
+                <span>Show Analysis</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal fade" id="gameOverModal">
+        <div class="modal-dialog">
+            <div class="modal-content dark">
+                <div class="modal-header">
+                    <h5 class="modal-title">Game Over</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="result-message"></div>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <span>Accuracy</span>
+                            <span class="accuracy-value">0%</span>
+                        </div>
+                        <div class="stat">
+                            <span>Moves</span>
+                            <span class="moves-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span>Time</span>
+                            <span class="time-value">0:00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn-primary" id="playAgainBtn">Play Again</button>
+                    <button type="button" class="btn-primary" id="analyzeGameBtn">Analyze Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Dependencies -->
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/chess.js"></script>
+    <script src="/js/chessboard-1.0.0.min.js"></script>
+    <script src="/js/socket.io.min.js"></script>
+    <script src="/js/botGame.js"></script>
+</body>
+</html> 

@@ -1,0 +1,198 @@
+<%- include('../partials/header') %>
+
+<div class="leaderboard-container">
+    <div class="content-wrapper">
+        <div class="header-section">
+            <h1>Leaderboards</h1>
+            <div class="underline"></div>
+            <p class="subtitle">Rise to the top of chess excellence</p>
+        </div>
+
+        <div class="coming-soon-section">
+            <div class="icon-container">
+                <i class="fas fa-crown"></i>
+                <div class="pulse"></div>
+            </div>
+            <h2>Coming Soon</h2>
+            <p class="description">Compete with players worldwide and climb the rankings.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-star"></i>
+                    <h3>Rating Categories</h3>
+                    <p>Separate rankings for different time controls</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-globe"></i>
+                    <h3>Global Rankings</h3>
+                    <p>See where you stand worldwide</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Regional Leaders</h3>
+                    <p>Compete in your country and region</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Monthly Contests</h3>
+                    <p>New chances to climb the ranks every month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.leaderboard-container {
+    min-height: calc(100vh - 60px);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 40px 20px;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.header-section h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #9b59b6, #f1c40f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.underline {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(45deg, #9b59b6, #f1c40f);
+    margin: 0 auto 20px;
+    border-radius: 2px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+}
+
+.coming-soon-section {
+    text-align: center;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.icon-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 30px;
+}
+
+.icon-container i {
+    font-size: 4rem;
+    color: #f1c40f;
+    position: relative;
+    z-index: 2;
+}
+
+.pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: rgba(241, 196, 15, 0.2);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.coming-soon-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #9b59b6, #f1c40f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.description {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature-card {
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #9b59b6, #f1c40f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.feature-card p {
+    color: #a0a0a0;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .header-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .coming-soon-section {
+        padding: 20px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<%- include('../partials/footer') %> 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Tournament - Chess Universe</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dark-theme">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title mb-4">Create Tournament</h1>
+
+                        <% if (locals.error) { %>
+                            <div class="alert alert-danger">
+                                <%= error %>
+                            </div>
+                        <% } %>
+
+                        <form action="/tournament/create" method="POST">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Tournament Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="format" class="form-label">Tournament Format</label>
+                                <select class="form-select" id="format" name="format" required>
+                                    <option value="single_elimination">Single Elimination</option>
+                                    <option value="double_elimination">Double Elimination</option>
+                                    <option value="round_robin">Round Robin</option>
+                                    <option value="swiss">Swiss</option>
+                                </select>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="timeControl.initial" class="form-label">Initial Time (minutes)</label>
+                                    <input type="number" class="form-control" id="timeControl.initial" 
+                                           name="timeControl[initial]" min="1" required>
+                                </div>
+                                <div class="col">
+                                    <label for="timeControl.increment" class="form-label">Increment (seconds)</label>
+                                    <input type="number" class="form-control" id="timeControl.increment" 
+                                           name="timeControl[increment]" min="0" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="maxPlayers" class="form-label">Maximum Players</label>
+                                <input type="number" class="form-control" id="maxPlayers" name="maxPlayers" 
+                                       min="2" max="128" required>
+                                <div class="form-text">Must be between 2 and 128 players</div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="prizePool.currency" class="form-label">Prize Currency</label>
+                                    <select class="form-select" id="prizePool.currency" name="prizePool[currency]" required>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="BTC">BTC</option>
+                                        <option value="ETH">ETH</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="prizePool.total" class="form-label">Total Prize Pool</label>
+                                    <input type="number" class="form-control" id="prizePool.total" 
+                                           name="prizePool[total]" min="0" step="0.01" required>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Create Tournament</button>
+                                <a href="/tournaments" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#format').change(function() {
+                const format = $(this).val();
+                const maxPlayersInput = $('#maxPlayers');
+                
+                // Set appropriate max players based on format
+                switch(format) {
+                    case 'single_elimination':
+                    case 'double_elimination':
+                        maxPlayersInput.attr('step', 2);
+                        maxPlayersInput.val(16);
+                        break;
+                    case 'round_robin':
+                        maxPlayersInput.attr('step', 1);
+                        maxPlayersInput.val(10);
+                        break;
+                    case 'swiss':
+                        maxPlayersInput.attr('step', 2);
+                        maxPlayersInput.val(32);
+                        break;
+                }
+            });
+
+            // Set initial values
+            $('#format').trigger('change');
+        });
+    </script>
+</body>
+</html> 

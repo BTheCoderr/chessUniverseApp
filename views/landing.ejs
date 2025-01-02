@@ -1,0 +1,220 @@
+<%- include('partials/header') %>
+
+<div class="landing-container">
+    <div class="hero-section">
+        <h1>Welcome to Chess Universe</h1>
+        <p class="tagline">Your Gateway to the World of Chess</p>
+        
+        <div class="auth-options">
+            <% if (!user) { %>
+                <div class="auth-buttons">
+                    <a href="/auth/login" class="btn btn-primary">Login</a>
+                    <a href="/auth/register" class="btn btn-secondary">Sign Up</a>
+                    <a href="/lobby" class="btn btn-outline">Play as Guest</a>
+                </div>
+            <% } else { %>
+                <div class="welcome-back">
+                    <h2>Welcome back, <%= user.username %>!</h2>
+                    <a href="/lobby" class="btn btn-primary">Enter Lobby</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <h2>Why Choose Chess Universe?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-chess"></i>
+                <h3>Play Anywhere</h3>
+                <p>Challenge players worldwide or practice against our advanced AI</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Learn & Improve</h3>
+                <p>Access tutorials, solve puzzles, and track your progress</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-trophy"></i>
+                <h3>Compete</h3>
+                <p>Join tournaments and climb the leaderboard</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Analyze</h3>
+                <p>Review games and get insights from our analysis engine</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="stat-card">
+            <h3>10,000+</h3>
+            <p>Active Players</p>
+        </div>
+        <div class="stat-card">
+            <h3>1M+</h3>
+            <p>Games Played</p>
+        </div>
+        <div class="stat-card">
+            <h3>50+</h3>
+            <p>Daily Tournaments</p>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>Ready to Play?</h2>
+        <p>Join the community and start your chess journey today!</p>
+        <div class="cta-buttons">
+            <a href="/auth/register" class="btn btn-primary">Create Account</a>
+            <a href="/lobby" class="btn btn-secondary">Try as Guest</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.landing-container {
+    min-height: 100vh;
+    background-color: #1a1a2e;
+    color: #fff;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 100px 20px;
+    background: linear-gradient(rgba(26, 26, 46, 0.9), rgba(26, 26, 46, 0.9)),
+                url('/img/chess-hero.jpg') center/cover;
+}
+
+.hero-section h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.tagline {
+    font-size: 1.5rem;
+    color: #a0a0a0;
+    margin-bottom: 40px;
+}
+
+.auth-options {
+    margin-top: 40px;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-secondary {
+    background: #2a2a40;
+    color: white;
+}
+
+.btn-outline {
+    border: 2px solid #4a90e2;
+    color: #4a90e2;
+}
+
+.features-section {
+    padding: 80px 20px;
+    background: #202035;
+}
+
+.features-section h2 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 30px;
+    background: #2a2a40;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: #4a90e2;
+    margin-bottom: 20px;
+}
+
+.stats-section {
+    display: flex;
+    justify-content: space-around;
+    padding: 60px 20px;
+    background: #1a1a2e;
+}
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    color: #4a90e2;
+}
+
+.cta-section {
+    text-align: center;
+    padding: 80px 20px;
+    background: #202035;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-section {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+
+<%- include('partials/footer') %> 

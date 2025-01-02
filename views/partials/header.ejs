@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Universe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/game.css">
+    <link rel="stylesheet" href="/css/chessboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+</head>
+<body class="dark-theme">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="/" class="logo">Chess Universe</a>
+        </div>
+        <div class="navbar-menu">
+            <a href="/" class="nav-item">Lobby</a>
+            <a href="/game/new" class="nav-item">Quick Play</a>
+            <a href="/bot" class="nav-item">Play vs Bot</a>
+            <a href="/tournament" class="nav-item">Tournaments</a>
+            <a href="/historical" class="nav-item">Game History</a>
+            <a href="/tutorial" class="nav-item">Learn</a>
+            <a href="/puzzles" class="nav-item">Puzzles</a>
+            <a href="/analysis" class="nav-item">Analysis</a>
+            <% if (locals.user) { %>
+                <a href="/profile" class="nav-item">Profile</a>
+                <form action="/auth/logout" method="POST" class="nav-item">
+                    <button type="submit" class="btn btn-link">Logout</button>
+                </form>
+            <% } else { %>
+                <a href="/login" class="nav-item">Login</a>
+                <a href="/register" class="nav-item">Register</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <main class="content">
+        <% if (locals.error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+        <% } %>
+        <% if (locals.success) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+        <% } %>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+</body>
+</html> 

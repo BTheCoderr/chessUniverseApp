@@ -1,0 +1,268 @@
+<%- include('partials/header') %>
+
+<div class="analysis-container">
+    <!-- Left Panel - Game Controls -->
+    <div class="controls-panel">
+        <div class="game-controls">
+            <button id="newPositionBtn" class="btn btn-primary">New Position</button>
+            <button id="flipBoardBtn" class="btn btn-secondary">Flip Board</button>
+            <button id="copyFenBtn" class="btn btn-info">Copy FEN</button>
+            <button id="pasteFenBtn" class="btn btn-info">Paste FEN</button>
+        </div>
+
+        <div class="engine-controls">
+            <div class="engine-header">
+                <h3>Stockfish Analysis</h3>
+                <div class="engine-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="engineToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="engine-settings">
+                <div class="setting">
+                    <label>Depth:</label>
+                    <select id="depthSelect">
+                        <option value="10">10</option>
+                        <option value="15" selected>15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label>MultiPV:</label>
+                    <select id="multiPvSelect">
+                        <option value="1">1</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+            <div id="engineOutput" class="engine-output"></div>
+        </div>
+
+        <div class="move-history">
+            <h3>Move History</h3>
+            <div id="movesList" class="moves-list"></div>
+        </div>
+    </div>
+
+    <!-- Center - Chessboard -->
+    <div class="board-container">
+        <div class="board-header">
+            <div class="player-info black">
+                <span class="player-name">Black</span>
+                <span class="player-rating"></span>
+            </div>
+        </div>
+
+        <div id="board" class="board"></div>
+
+        <div class="board-footer">
+            <div class="player-info white">
+                <span class="player-name">White</span>
+                <span class="player-rating"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel - Analysis & Betting -->
+    <div class="side-panel">
+        <div class="analysis-tools">
+            <h3>Position Analysis</h3>
+            <div id="positionEval" class="position-eval"></div>
+            <div id="bestLines" class="best-lines"></div>
+            <div class="move-indicators">
+                <div id="moveStrength" class="move-strength"></div>
+                <div id="moveAnnotation" class="move-annotation"></div>
+            </div>
+        </div>
+
+        <div class="betting-panel">
+            <h3>Position Betting</h3>
+            <div class="betting-controls">
+                <select id="betType">
+                    <option value="winner">Winner</option>
+                    <option value="advantage">Advantage</option>
+                    <option value="nextMove">Next Move</option>
+                </select>
+                <input type="number" id="betAmount" placeholder="Amount" min="1">
+                <select id="betChoice">
+                    <option value="white">White</option>
+                    <option value="black">Black</option>
+                    <option value="draw">Draw</option>
+                </select>
+                <button id="placeBetBtn" class="btn btn-success">Place Bet</button>
+            </div>
+            <div id="activeBets" class="active-bets">
+                <h4>Active Bets</h4>
+                <div class="bets-list"></div>
+            </div>
+        </div>
+
+        <div class="opening-book">
+            <h3>Opening Explorer</h3>
+            <div id="openingInfo" class="opening-info"></div>
+            <div id="openingMoves" class="opening-moves"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.analysis-container {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 60px);
+}
+
+.controls-panel, .side-panel {
+    background: #2c2c2c;
+    border-radius: 8px;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.engine-controls {
+    margin: 20px 0;
+    padding: 15px;
+    background: #363636;
+    border-radius: 6px;
+}
+
+.engine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.engine-settings {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.engine-output {
+    font-family: monospace;
+    background: #1c1c1c;
+    padding: 10px;
+    border-radius: 4px;
+    min-height: 100px;
+}
+
+.board-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.board {
+    width: 600px;
+    height: 600px;
+}
+
+.betting-panel {
+    margin-top: 20px;
+    padding: 15px;
+    background: #363636;
+    border-radius: 6px;
+}
+
+.betting-controls {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.active-bets {
+    background: #1c1c1c;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.move-strength {
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.opening-book {
+    margin-top: 20px;
+    padding: 15px;
+    background: #363636;
+    border-radius: 6px;
+}
+
+.opening-moves {
+    display: grid;
+    gap: 5px;
+    margin-top: 10px;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script src="/js/analysis.js"></script>
+
+<%- include('partials/footer') %> 

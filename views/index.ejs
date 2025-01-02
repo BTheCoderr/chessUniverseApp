@@ -1,68 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Game</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    <div class="game-container">
-        <!-- Chessboard -->
-        <div id="chessboard" class="chessboard"></div>
-        <!-- Game Controls -->
-        <div class="controls">
-            <button id="resetButton">Reset Game</button>
-            <button id="saveButton">Save Game</button>
-            <button id="loadButton">Load Game</button>
-            <input type="text" id="gameId" placeholder="Enter Game ID">
-            <div id="wagerForm">
-                <input type="number" id="wagerAmount" placeholder="Enter Wager Amount">
-                <button type="submit">Place Wager</button>
-            </div>
-            <div id="wagerStatus"></div><!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Chess Game</title>
-                <link rel="stylesheet" href="/css/styles.css">
-            </head>
-            <body>
-                <div class="game-container">
-                    <div id="chessboard" class="chessboard"></div>
-                    <div class="controls">
-                        <button id="resetButton">Reset Game</button>
-                        <button id="saveButton">Save Game</button>
-                        <button id="loadButton">Load Game</button>
-                        <input type="text" id="gameId" placeholder="Enter Game ID">
-                        <div id="wagerForm">
-                            <input type="number" id="wagerAmount" placeholder="Enter Wager Amount">
-                            <button type="submit">Place Wager</button>
-                        </div>
-                        <div id="wagerStatus"></div>
-                    </div>
-                    <div class="moves-history">
-                        <h2>Moves History</h2>
-                        <ul id="movesList"></ul>
-                    </div>
-                    <div id="timer" class="timer"></div>
-                </div>
-                <script src="/socket.io/socket.io.js"></script>
-                <script src="/js/chess.js"></script>
-            </body>
-            </html>
-            
+<div class="game-container">
+    <!-- Left Sidebar - Player Panels -->
+    <div class="player-sidebar">
+        <div class="player-panel">
+            <div class="player-name">White</div>
+            <div class="player-timer" id="opponent-timer">10:00</div>
+            <div class="captured-pieces" id="captured-by-opponent"></div>
         </div>
-        <!-- Moves History -->
+
+        <div class="player-panel">
+            <div class="player-name">Black (<%= username %>)</div>
+            <div class="player-timer" id="player-timer">10:00</div>
+            <div class="captured-pieces" id="captured-by-player"></div>
+        </div>
+    </div>
+
+    <!-- Game Board Section -->
+    <div class="game-board-container">
+        <div class="turn-indicator">Black's Turn</div>
+        
+        <div class="chessboard-wrapper">
+            <!-- Rank labels (1-8) -->
+            <div class="coordinate-labels ranks">
+                <% [8,7,6,5,4,3,2,1].forEach(rank => { %>
+                    <span class="coordinate-label"><%= rank %></span>
+                <% }); %>
+            </div>
+
+            <div id="chessboard" class="chessboard">
+                <!-- Chess squares will be created by JavaScript -->
+            </div>
+            
+            <!-- File labels (a-h) -->
+            <div class="coordinate-labels files">
+                <% ['a','b','c','d','e','f','g','h'].forEach(file => { %>
+                    <span class="coordinate-label"><%= file %></span>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar - Game Controls -->
+    <div class="game-sidebar">
+        <div class="controls">
+            <h2 class="section-title">Game Controls</h2>
+            <button id="resetButton" class="control-btn">New Game</button>
+            <button id="saveButton" class="control-btn">Save Game</button>
+            <div class="input-container">
+                <input type="text" id="gameId" placeholder="Enter Game ID">
+            </div>
+            <button id="loadButton" class="control-btn">Load Game</button>
+        </div>
+
         <div class="moves-history">
-            <h2>Moves History</h2>
+            <h2 class="section-title">Moves History</h2>
             <ul id="movesList"></ul>
         </div>
-        <!-- Timer -->
-        <div id="timer" class="timer"></div>
+
+        <div class="wager-section">
+            <h2 class="section-title">Place Wager</h2>
+            <div id="wagerForm">
+                <div class="input-container">
+                    <input type="number" id="wagerAmount" placeholder="Enter Amount">
+                </div>
+                <button type="submit" class="control-btn">Place Wager</button>
+            </div>
+            <div id="wagerStatus"></div>
+        </div>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/chess.js"></script>
-</body>
-</html>
+</div>
+
+<div id="game-status" class="game-status"></div>
+<div id="notification" class="notification"></div>

@@ -3,29 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Chess Universe - Login</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
 </head>
 <body>
-    <div class="login-container">
-        <!-- Login Form -->
-        <form class="login-form" action="/login" method="post">
-            <h2>Login</h2>
-            <!-- Display error message if it exists -->
-            <% if (typeof error !== 'undefined' && error) { %>
-                <div class="error-message"><%= error %></div>
+    <div class="auth-container">
+        <div class="auth-box">
+            <h1 class="auth-title">Chess Universe</h1>
+            <p class="auth-subtitle">Login to your account</p>
+            
+            <% if (locals.error) { %>
+                <div class="auth-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= error %>
+                </div>
             <% } %>
-            <!-- Username Input -->
-            <input type="text" name="username" placeholder="Username" required>
-            <!-- Password Input -->
-            <input type="password" name="password" placeholder="Password" required>
-            <!-- Login Button -->
-            <button type="submit">Login</button>
-            <!-- Register Button -->
-            <button type="button" onclick="window.location.href='/register'">Don't have an account? Register</button>
-            <!-- Guest Play Button -->
-            <button id="guestButton" type="button" onclick="window.location.href='/game'">Play as Guest</button>
-        </form>
+
+            <form class="auth-form" action="/auth/login" method="POST">
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="Username" required>
+                </div>
+                
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <a href="/register" class="auth-link">Create Account</a>
+                <span class="auth-separator">|</span>
+                <a href="/play-as-guest" class="auth-link">Play as Guest</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>

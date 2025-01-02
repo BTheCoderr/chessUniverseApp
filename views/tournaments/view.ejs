@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= tournament.title %> - Chess Universe</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dark-theme">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h1 class="card-title"><%= tournament.title %></h1>
+                        <div class="tournament-info">
+                            <p><strong>Format:</strong> <%= tournament.format %></p>
+                            <p><strong>Status:</strong> <%= tournament.status %></p>
+                            <p><strong>Players:</strong> <%= tournament.participants.length %>/<%= tournament.settings.maxPlayers %></p>
+                            <p><strong>Time Control:</strong> <%= tournament.settings.timeControl.initial %> + <%= tournament.settings.timeControl.increment %></p>
+                            <% if (tournament.settings.prizePool.total) { %>
+                                <p><strong>Prize Pool:</strong> <%= tournament.settings.prizePool.currency %> <%= tournament.settings.prizePool.total %></p>
+                            <% } %>
+                        </div>
+
+                        <% if (tournament.description) { %>
+                            <div class="mt-4">
+                                <h5>Description</h5>
+                                <p><%= tournament.description %></p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <% if (tournament.status === 'in_progress' || tournament.status === 'completed') { %>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Round</h5>
+                            <% if (tournament.rounds && tournament.rounds.length > 0) { %>
+                                <div class="matches-list">
+                                    <% tournament.rounds[tournament.currentRound - 1].matches.forEach((match, index) => { %>
+                                        <div class="match-card">
+                                            <div class="match-players">
+                                                <div class="player">
+                                                    <% if (match.players[0]) { %>
+                                                        <%= match.players[0].username %>
+                                                    <% } else { %>
+                                                        TBD
+                                                    <% } %>
+                                                </div>
+                                                <div class="vs">vs</div>
+                                                <div class="player">
+                                                    <% if (match.players[1]) { %>
+                                                        <%= match.players[1].username %>
+                                                    <% } else { %>
+                                                        TBD
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            <% if (match.status === 'completed') { %>
+                                                <div class="match-result">
+                                                    <%= match.result.score %>
+                                                </div>
+                                            <% } else if (match.status === 'in_progress') { %>
+                                                <a href="/game/<%= match.gameId %>" class="btn btn-primary btn-sm">Watch</a>
+                                            <% } %>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Participants</h5>
+                        <div class="participants-list">
+                            <% tournament.participants.forEach(participant => { %>
+                                <div class="participant-item">
+                                    <span class="participant-name"><%= participant.username %></span>
+                                    <span class="participant-rating">Rating: <%= participant.rating %></span>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (tournament.status === 'registration') { %>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Registration</h5>
+                            <p>Tournament starts when enough players join.</p>
+                            <button class="btn btn-success btn-block join-tournament" data-id="<%= tournament._id %>">
+                                Join Tournament
+                            </button>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.join-tournament').click(function() {
+                const tournamentId = $(this).data('id');
+                $.post(`/tournament/${tournamentId}/join`)
+                    .done(function() {
+                        window.location.reload();
+                    })
+                    .fail(function(xhr) {
+                        alert(xhr.responseJSON?.error || 'Failed to join tournament');
+                    });
+            });
+        });
+    </script>
+</body>
+</html> 

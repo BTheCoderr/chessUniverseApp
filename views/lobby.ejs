@@ -1,0 +1,306 @@
+<%- include('partials/header') %>
+
+<div class="lobby-container">
+    <div class="lobby-header">
+        <h1>Chess Universe</h1>
+        <p class="subtitle">Choose your next challenge</p>
+    </div>
+
+    <div class="game-modes">
+        <!-- Play Section -->
+        <div class="mode-section">
+            <h2>Play Chess</h2>
+            <div class="mode-grid">
+                <div class="mode-card" onclick="window.location.href='/game/play-human'">
+                    <i class="fas fa-user-friends"></i>
+                    <h3>Play vs Human</h3>
+                    <p>Challenge other players online</p>
+                    <div class="mode-options">
+                        <a href="/game/play-human?mode=quick" class="btn quick-play">Quick Play</a>
+                        <a href="/game/play-human?mode=custom" class="btn custom-game">Custom Game</a>
+                    </div>
+                </div>
+
+                <div class="mode-card" onclick="window.location.href='/game/play-ai'">
+                    <i class="fas fa-robot"></i>
+                    <h3>Play vs Computer</h3>
+                    <p>Test your skills against AI</p>
+                    <div class="difficulty-selector">
+                        <button class="diff-btn" data-level="1">Easy</button>
+                        <button class="diff-btn" data-level="2">Medium</button>
+                        <button class="diff-btn" data-level="3">Hard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learn Section -->
+        <div class="mode-section">
+            <h2>Learn & Practice</h2>
+            <div class="mode-grid">
+                <div class="mode-card" onclick="window.location.href='/tutorial'">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Tutorials</h3>
+                    <p>Learn chess from basics to advanced</p>
+                    <div class="progress-info">
+                        <div class="progress-bar">
+                            <div class="progress" style="width: 0%"></div>
+                        </div>
+                        <span>0% Complete</span>
+                    </div>
+                </div>
+
+                <div class="mode-card" onclick="window.location.href='/puzzles'">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <h3>Puzzles</h3>
+                    <p>Solve chess puzzles and improve</p>
+                    <div class="stats-preview">
+                        <span>Rating: <strong id="puzzleRating">1500</strong></span>
+                        <span>Solved: <strong id="puzzlesSolved">0</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compete Section -->
+        <div class="mode-section">
+            <h2>Compete</h2>
+            <div class="mode-grid">
+                <div class="mode-card" onclick="window.location.href='/tournament'">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Tournaments</h3>
+                    <p>Join tournaments and win prizes</p>
+                    <div class="tournament-preview">
+                        <div class="active-tournament">
+                            <span class="status">Active Tournament</span>
+                            <span class="name">Daily Blitz</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mode-card" onclick="window.location.href='/game/spectate'">
+                    <i class="fas fa-eye"></i>
+                    <h3>Watch Live Games</h3>
+                    <p>Spectate ongoing matches</p>
+                    <div class="live-preview">
+                        <span class="active-games"><strong id="liveGamesCount">0</strong> Live Games</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.lobby-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.lobby-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.lobby-header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.2em;
+}
+
+.mode-section {
+    margin-bottom: 40px;
+}
+
+.mode-section h2 {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.mode-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.mode-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.mode-card i {
+    font-size: 2em;
+    margin-bottom: 15px;
+    color: #4a90e2;
+}
+
+.mode-card h3 {
+    margin-bottom: 10px;
+}
+
+.mode-card p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.mode-options {
+    display: flex;
+    gap: 10px;
+}
+
+.mode-options button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.quick-play {
+    background: #4a90e2;
+    color: white;
+}
+
+.custom-game {
+    background: #f0f0f0;
+}
+
+.difficulty-selector {
+    display: flex;
+    gap: 5px;
+}
+
+.diff-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.diff-btn:hover {
+    background: #e0e0e0;
+}
+
+.progress-info {
+    margin-top: 15px;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.progress {
+    height: 100%;
+    background: #4a90e2;
+    border-radius: 3px;
+}
+
+.stats-preview, .tournament-preview, .live-preview {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.active-tournament {
+    display: flex;
+    flex-direction: column;
+}
+
+.status {
+    font-size: 0.8em;
+    color: #4a90e2;
+}
+
+.name {
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .mode-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Load user stats
+    async function loadUserStats() {
+        try {
+            const response = await fetch('/api/user/stats');
+            if (response.ok) {
+                const stats = await response.json();
+                document.getElementById('puzzleRating').textContent = stats.puzzles?.rating || 1500;
+                document.getElementById('puzzlesSolved').textContent = stats.puzzles?.solved || 0;
+                
+                // Update tutorial progress
+                const progress = stats.tutorials?.progress || 0;
+                document.querySelector('.progress').style.width = `${progress}%`;
+                document.querySelector('.progress-info span').textContent = `${progress}% Complete`;
+            }
+        } catch (error) {
+            console.error('Failed to load user stats:', error);
+        }
+    }
+
+    // Load live games count
+    async function loadLiveGames() {
+        try {
+            const response = await fetch('/api/games/live/count');
+            if (response.ok) {
+                const { count } = await response.json();
+                document.getElementById('liveGamesCount').textContent = count;
+            }
+        } catch (error) {
+            console.error('Failed to load live games count:', error);
+        }
+    }
+
+    // Initialize
+    loadUserStats();
+    loadLiveGames();
+
+    // Set up difficulty buttons
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const level = btn.dataset.level;
+            window.location.href = `/game/play-ai?level=${level}`;
+        });
+    });
+
+    // Set up game mode buttons
+    document.querySelectorAll('.mode-options button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isQuickPlay = btn.classList.contains('quick-play');
+            window.location.href = `/game/play-human?mode=${isQuickPlay ? 'quick' : 'custom'}`;
+        });
+    });
+});
+</script>
+
+<%- include('partials/footer') %> 

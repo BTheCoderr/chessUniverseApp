@@ -1,0 +1,303 @@
+<%- include('layout', { title: 'Historical Games' }) %>
+
+<div class="historical-list-container">
+    <div class="header">
+        <h1>Historical Chess Games</h1>
+        <p>Explore famous chess games throughout history, replay them move by move, and try alternative strategies.</p>
+    </div>
+
+    <div class="filters">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search games by title, player, or event...">
+        </div>
+        
+        <div class="filter-group">
+            <select id="yearFilter">
+                <option value="">All Years</option>
+                <option value="2000">2000s</option>
+                <option value="1900">1900s</option>
+                <option value="1800">1800s</option>
+            </select>
+            
+            <select id="resultFilter">
+                <option value="">All Results</option>
+                <option value="1-0">White Wins</option>
+                <option value="0-1">Black Wins</option>
+                <option value="1/2-1/2">Draw</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="games-grid">
+        <% games.forEach(game => { %>
+            <div class="game-card" data-year="<%= game.yearPlayed %>" data-result="<%= game.result %>">
+                <div class="game-header">
+                    <h3><%= game.title %></h3>
+                    <span class="year"><%= game.yearPlayed %></span>
+                </div>
+                
+                <div class="game-details">
+                    <div class="players">
+                        <div class="white-player">
+                            <i class="fas fa-chess-king"></i>
+                            <%= game.white.name %>
+                        </div>
+                        <div class="vs">vs</div>
+                        <div class="black-player">
+                            <i class="fas fa-chess-king"></i>
+                            <%= game.black.name %>
+                        </div>
+                    </div>
+                    
+                    <div class="event-info">
+                        <i class="fas fa-trophy"></i>
+                        <%= game.event %>
+                    </div>
+                    
+                    <div class="result">
+                        Result: <%= game.result %>
+                    </div>
+                </div>
+                
+                <a href="/historical/<%= game._id %>" class="play-btn">
+                    <i class="fas fa-play"></i>
+                    Replay Game
+                </a>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const yearFilter = document.getElementById('yearFilter');
+    const resultFilter = document.getElementById('resultFilter');
+    const gameCards = document.querySelectorAll('.game-card');
+    
+    function filterGames() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const yearValue = yearFilter.value;
+        const resultValue = resultFilter.value;
+        
+        gameCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const players = card.querySelector('.players').textContent.toLowerCase();
+            const event = card.querySelector('.event-info').textContent.toLowerCase();
+            const year = card.dataset.year;
+            const result = card.dataset.result;
+            
+            const matchesSearch = !searchTerm || 
+                title.includes(searchTerm) || 
+                players.includes(searchTerm) || 
+                event.includes(searchTerm);
+                
+            const matchesYear = !yearValue || year >= yearValue;
+            const matchesResult = !resultValue || result === resultValue;
+            
+            card.style.display = matchesSearch && matchesYear && matchesResult ? 'flex' : 'none';
+        });
+    }
+    
+    searchInput.addEventListener('input', filterGames);
+    yearFilter.addEventListener('change', filterGames);
+    resultFilter.addEventListener('change', filterGames);
+});
+</script>
+
+<style>
+.historical-list-container {
+    padding: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.header h1 {
+    color: #e2e8f0;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: #e2e8f0;
+    opacity: 0.8;
+    font-size: 1.1em;
+}
+
+.filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.search-box {
+    flex-grow: 1;
+    position: relative;
+    max-width: 500px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #e2e8f0;
+    opacity: 0.8;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    background: rgba(22, 33, 62, 0.8);
+    border: 1px solid rgba(226, 232, 240, 0.1);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 1em;
+}
+
+.filter-group {
+    display: flex;
+    gap: 15px;
+}
+
+.filter-group select {
+    padding: 12px 20px;
+    background: rgba(22, 33, 62, 0.8);
+    border: 1px solid rgba(226, 232, 240, 0.1);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.game-card {
+    background: rgba(48, 71, 94, 0.8);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.3s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.game-header h3 {
+    color: #e2e8f0;
+    font-size: 1.2em;
+    margin: 0;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.year {
+    color: #e2e8f0;
+    opacity: 0.8;
+    font-size: 0.9em;
+    padding: 4px 8px;
+    background: rgba(22, 33, 62, 0.8);
+    border-radius: 4px;
+}
+
+.players {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.white-player, .black-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e2e8f0;
+}
+
+.vs {
+    text-align: center;
+    color: #e2e8f0;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.event-info {
+    color: #e2e8f0;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.result {
+    color: #e2e8f0;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.play-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    background: linear-gradient(135deg, #30475e 0%, #16213e 100%);
+    border: 1px solid rgba(226, 232, 240, 0.2);
+    border-radius: 8px;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: auto;
+    transition: all 0.3s ease;
+}
+
+.play-btn:hover {
+    background: linear-gradient(135deg, #16213e 0%, #30475e 100%);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .historical-list-container {
+        padding: 20px;
+    }
+    
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        max-width: none;
+    }
+    
+    .filter-group {
+        flex-wrap: wrap;
+    }
+    
+    .filter-group select {
+        flex-grow: 1;
+    }
+}
+</style> 

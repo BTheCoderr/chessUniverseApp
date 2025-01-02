@@ -1,0 +1,152 @@
+/* Tournament List */
+.tournament-card {
+    transition: transform 0.2s;
+}
+
+.tournament-card:hover {
+    transform: translateY(-2px);
+}
+
+.tournament-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--bs-gray-600);
+}
+
+.info-item i {
+    font-size: 1.1rem;
+}
+
+/* Tournament View */
+.match-card {
+    background: var(--bs-gray-800);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.match-players {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.match-players .player {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem;
+    background: var(--bs-gray-700);
+    border-radius: 0.25rem;
+}
+
+.match-players .vs {
+    font-weight: bold;
+    color: var(--bs-gray-500);
+}
+
+.match-result {
+    text-align: center;
+    font-weight: bold;
+    color: var(--bs-primary);
+}
+
+.participants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.participant-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: var(--bs-gray-800);
+    border-radius: 0.25rem;
+}
+
+.participant-rating {
+    color: var(--bs-gray-500);
+    font-size: 0.9rem;
+}
+
+/* Tournament Creation Form */
+.form-text {
+    color: var(--bs-gray-500);
+}
+
+/* Dark Theme Overrides */
+.dark-theme {
+    background-color: var(--bs-gray-900);
+    color: var(--bs-light);
+}
+
+.dark-theme .card {
+    background-color: var(--bs-gray-800);
+    border-color: var(--bs-gray-700);
+}
+
+.dark-theme .form-control,
+.dark-theme .form-select {
+    background-color: var(--bs-gray-700);
+    border-color: var(--bs-gray-600);
+    color: var(--bs-light);
+}
+
+.dark-theme .form-control:focus,
+.dark-theme .form-select:focus {
+    background-color: var(--bs-gray-700);
+    border-color: var(--bs-primary);
+    color: var(--bs-light);
+}
+
+.dark-theme .form-check-input {
+    background-color: var(--bs-gray-700);
+    border-color: var(--bs-gray-600);
+}
+
+.dark-theme .form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.dark-theme .btn-secondary {
+    background-color: var(--bs-gray-700);
+    border-color: var(--bs-gray-600);
+}
+
+.dark-theme .btn-secondary:hover {
+    background-color: var(--bs-gray-600);
+    border-color: var(--bs-gray-500);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tournament-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .match-players {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .match-players .player {
+        width: 100%;
+    }
+
+    .match-players .vs {
+        margin: 0.25rem 0;
+    }
+} 

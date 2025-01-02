@@ -1,0 +1,131 @@
+<%- include('partials/header') %>
+
+<div class="waiting-container">
+    <div class="spinner"></div>
+    <h2>Looking for an opponent...</h2>
+    
+    <div class="waiting-info">
+        <div class="wait-time">
+            Time in queue: <span id="waitTime">0:00</span>
+        </div>
+        <div class="queue-info">
+            Players in queue: <span id="queueSize">-</span>
+        </div>
+        <div class="rating-range">
+            Rating range: <span id="ratingRange">±200</span>
+        </div>
+    </div>
+
+    <div class="preferences-info">
+        <h3>Your Preferences</h3>
+        <div class="preference-item">
+            Time Control: <%= preferences.timeControl || '5+0' %>
+        </div>
+        <div class="preference-item">
+            Game Type: <%= preferences.rated ? 'Rated' : 'Unrated' %>
+        </div>
+    </div>
+
+    <button id="cancelBtn" class="btn btn-danger">Cancel Search</button>
+</div>
+
+<script>
+    const queueId = '<%= queueId %>';
+    let startTime = Date.now();
+    
+    // Update wait time display
+    setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('waitTime').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+
+    // Poll for queue status
+    async function updateQueueStatus() {
+        try {
+            const response = await fetch(`/game/queue-status/${queueId}`);
+            const data = await response.json();
+            
+            if (data.match) {
+                window.location.href = `/game/${data.match.gameId}`;
+                return;
+            }
+
+            document.getElementById('queueSize').textContent = data.queueSize;
+            document.getElementById('ratingRange').textContent = `±${data.ratingRange}`;
+        } catch (err) {
+            console.error('Error checking queue status:', err);
+        }
+    }
+
+    // Check queue status every 2 seconds
+    const statusInterval = setInterval(updateQueueStatus, 2000);
+
+    // Cancel search
+    document.getElementById('cancelBtn').addEventListener('click', async () => {
+        try {
+            await fetch(`/game/cancel-search/${queueId}`, { method: 'POST' });
+            window.location.href = '/';
+        } catch (err) {
+            console.error('Error canceling search:', err);
+        }
+    });
+</script>
+
+<style>
+.waiting-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.waiting-info {
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+.waiting-info > div {
+    margin: 0.5rem 0;
+}
+
+.preferences-info {
+    margin: 2rem 0;
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.preference-item {
+    margin: 0.5rem 0;
+    color: #666;
+}
+
+#cancelBtn {
+    margin-top: 2rem;
+    padding: 0.5rem 2rem;
+}
+</style>
+
+<%- include('partials/footer') %> 

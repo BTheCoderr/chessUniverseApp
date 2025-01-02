@@ -6,361 +6,602 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadButton = document.getElementById('loadButton')
     const gameIdInput = document.getElementById('gameId')
     const movesList = document.getElementById('movesList')
-    const timerElement = document.getElementById('timer')
     const wagerForm = document.getElementById('wagerForm')
     const wagerStatus = document.getElementById('wagerStatus')
-    let currentPlayer = 'black' // Start with black
-    const initialRows = ["♖♘♗♕♔♗♘♖", "♙♙♙♙♙♙♙♙", "", "", "", "", "♟♟♟♟♟♟♟♟", "♜♞♝♛♚♝♞♜"]
-    let squares = []
-    let timeRemaining = 600 // 10 minutes in seconds
-    let timer
+    const gameStatus = document.getElementById('game-status')
+    const notification = document.getElementById('notification')
+    const playerTimer = document.getElementById('player-timer')
+    const opponentTimer = document.getElementById('opponent-timer')
+    const capturedByPlayer = document.getElementById('captured-by-player')
+    const capturedByOpponent = document.getElementById('captured-by-opponent')
+    const turnIndicator = document.querySelector('.turn-indicator')
 
-    function createSquare(i, j, piece) {
-        const square = document.createElement('div')
-        square.className = `square ${(i + j) % 2 === 0 ? 'white' : 'black'}`
-        square.textContent = piece || ''
-        square.draggable = !!square.textContent
-        square.id = `square-${i}-${j}`
+    let currentPlayer = 'black'
+    let selectedSquare = null
+    let gameActive = true
+    let capturedPieces = { white: [], black: [] }
+    let moveHistory = []
+    let playerTime = 600 // 10 minutes in seconds
+    let opponentTime = 600
+    let timerInterval
 
-        square.addEventListener('dragstart', function(e) {
-            if (isValidPiece(square.textContent, currentPlayer)) {
-                e.dataTransfer.setData('piece', e.target.textContent)
-                e.dataTransfer.setData('sourceId', e.target.id)
-                e.dataTransfer.effectAllowed = 'move'
-                e.target.classList.add('dragging')
-                console.log(`Drag start: ${e.target.textContent} from ${e.target.id}`)
-                highlightPossibleMoves(square)
-            } else {
-                e.preventDefault()
+    const initialBoard = [
+        ['♜', '♘', '♝', '♛', '♚', '♝', '♞', '♜'],  // Black pieces
+        ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],  // Black pawns
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''],
+        ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],  // White pawns
+        ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']   // White pieces
+    ]
+
+    function updateTurnIndicator() {
+        turnIndicator.textContent = `${currentPlayer === 'black' ? 'Black' : 'White'}'s Turn`
+        turnIndicator.className = `turn-indicator ${currentPlayer}-turn`
+    }
+
+    function createBoard() {
+        board.innerHTML = ''
+        
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const square = document.createElement('div')
+                square.className = `square ${(i + j) % 2 === 0 ? 'white' : 'black'}`
+                square.dataset.row = i
+                square.dataset.col = j
+                
+                const piece = initialBoard[i][j]
+                if (piece) {
+                    square.textContent = piece
+                    // Set piece color based on the piece type
+                    square.dataset.pieceColor = '♔♕♖♗♘♙'.includes(piece) ? 'white' : 'black'
+                }
+                
+                square.addEventListener('click', handleSquareClick)
+                board.appendChild(square)
             }
-        })
+        }
+        updateTurnIndicator()
+        soundManager.play('gameStart')
+        startTimer()
+    }
 
-        square.addEventListener('dragover', function(e) {
-            e.preventDefault()
-            const piece = e.dataTransfer.getData('piece')
-            const sourceId = e.dataTransfer.getData('sourceId')
-            const sourceSquare = document.getElementById(sourceId)
-            if (sourceSquare && isValidDropTarget(sourceSquare, square, piece, currentPlayer)) {
-                e.dataTransfer.dropEffect = 'move'
-                e.target.classList.add('valid-drop')
-                console.log(`Drag over: valid drop target ${square.id}`)
-            } else {
-                console.log(`Drag over: invalid drop target ${square.id}`)
-            }
-        })
+    function handleSquareClick(e) {
+        if (!gameActive) return
 
-        square.addEventListener('dragleave', function(e) {
-            e.target.classList.remove('valid-drop')
-            console.log(`Drag leave: ${square.id}`)
-        })
+        const square = e.target
+        const piece = square.textContent
+        const row = parseInt(square.dataset.row)
+        const col = parseInt(square.dataset.col)
 
-        square.addEventListener('drop', function(e) {
-            e.preventDefault()
-            e.target.classList.remove('valid-drop')
-            const piece = e.dataTransfer.getData('piece')
-            const sourceId = e.dataTransfer.getData('sourceId')
-            const sourceSquare = document.getElementById(sourceId)
-            console.log(`Drop: ${piece} to ${square.id} from ${sourceId}`)
+        if (selectedSquare) {
+            if (isValidMove(selectedSquare, square)) {
+                const fromRow = parseInt(selectedSquare.dataset.row)
+                const fromCol = parseInt(selectedSquare.dataset.col)
+                
+                // Create algebraic notation for the move
+                const from = `${String.fromCharCode(97 + fromCol)}${8 - fromRow}`
+                const to = `${String.fromCharCode(97 + col)}${8 - row}`
+                const moveText = `${from}-${to}`
+                
+                const capturedPiece = movePiece(selectedSquare, square)
+                if (capturedPiece) {
+                    soundManager.play('capture')
+                } else {
+                    soundManager.play('move')
+                }
+                
+                addMoveToHistory(moveText)
 
-            if (sourceSquare !== e.target && (!e.target.textContent || isOpponentPiece(piece, e.target.textContent))) {
-                e.target.textContent = piece
-                e.target.draggable = true
-                sourceSquare.textContent = ''
-                sourceSquare.draggable = false
-
-                recordMove(sourceSquare.id, e.target.id, piece)
-                clearHighlights()
-
-                if (isInCheck(currentPlayer)) {
-                    alert(`${currentPlayer} is in check!`)
+                // Check for check/checkmate
+                if (isCheck()) {
+                    soundManager.play('check')
+                    showNotification(`${currentPlayer === 'black' ? 'White' : 'Black'} is in check!`)
+                    
+                    if (isCheckmate()) {
+                        soundManager.play('gameEnd')
+                        endGame(`Checkmate! ${currentPlayer === 'black' ? 'Black' : 'White'} wins!`)
+                    }
                 }
 
-                if (isCheckmate(currentPlayer)) {
-                    alert(`${currentPlayer} is in checkmate! Game over.`)
-                }
+                currentPlayer = currentPlayer === 'black' ? 'white' : 'black'
+                updateTurnIndicator()
 
-                // Emit the move to the server
+                // Auto-save after each move
+                saveToLocalStorage()
+
                 socket.emit('move', {
-                    piece: piece,
-                    sourceId: sourceId,
-                    targetId: e.target.id
+                    from: { row: fromRow, col: fromCol },
+                    to: { row, col }
                 })
+            }
+            clearSelection()
+        } else if (piece && isPieceOwnedByCurrentPlayer(piece)) {
+            selectSquare(square)
+        }
+    }
 
-                currentPlayer = currentPlayer === 'white' ? 'black' : 'white'
-            } else {
-                console.log(`Drop rejected: invalid move`)
-                clearHighlights()
+    function selectSquare(square) {
+        selectedSquare = square
+        square.classList.add('selected')
+        highlightValidMoves(square)
+    }
+
+    function clearSelection() {
+        if (selectedSquare) {
+            selectedSquare.classList.remove('selected')
+            clearHighlights()
+            selectedSquare = null
+        }
+    }
+
+    function highlightValidMoves(square) {
+        clearHighlights()
+        const piece = square.textContent
+        const row = parseInt(square.dataset.row)
+        const col = parseInt(square.dataset.col)
+
+        getAllSquares().forEach(targetSquare => {
+            const targetRow = parseInt(targetSquare.dataset.row)
+            const targetCol = parseInt(targetSquare.dataset.col)
+            
+            if (isValidMove(square, targetSquare)) {
+                if (targetSquare.textContent) {
+                    targetSquare.classList.add('valid-capture')
+                } else {
+                    targetSquare.classList.add('valid-move')
+                }
             }
         })
+    }
 
-        square.addEventListener('dragend', function(e) {
-            e.target.classList.remove('dragging')
-            clearHighlights()
-            console.log(`Drag end: ${e.target.textContent}`)
+    function clearHighlights() {
+        getAllSquares().forEach(square => {
+            square.classList.remove('valid-move', 'valid-capture')
         })
-
-        return square
     }
 
-    function isValidPiece(piece, player) {
-        const isWhitePiece = piece.charCodeAt(0) >= 9812 && piece.charCodeAt(0) <= 9817
-        return (player === 'white' && isWhitePiece) || (player === 'black' && !isWhitePiece)
+    function getAllSquares() {
+        return Array.from(board.getElementsByClassName('square'))
     }
 
-    function isValidDropTarget(sourceSquare, targetSquare, piece, player) {
-        if (!targetSquare.textContent || isOpponentPiece(piece, targetSquare.textContent)) {
-            const sourceCoords = getSquareCoords(sourceSquare.id)
-            const targetCoords = getSquareCoords(targetSquare.id)
-            return isValidMove(piece, sourceCoords, targetCoords)
+    function handleCapture(piece) {
+        if ('♔♕♖♗♘♙'.includes(piece)) {
+            capturedPieces.white.push(piece);
+            capturedByOpponent.textContent = capturedPieces.white.join(' ');
+        } else {
+            capturedPieces.black.push(piece);
+            capturedByPlayer.textContent = capturedPieces.black.join(' ');
+        }
+    }
+
+    function addMoveToHistory(moveText) {
+        const li = document.createElement('li');
+        li.textContent = `${moveHistory.length + 1}. ${moveText}`;
+        movesList.insertBefore(li, movesList.firstChild); // Add new moves at the top
+        moveHistory.push(moveText);
+        
+        // Ensure the move is visible by scrolling to it
+        movesList.scrollTop = 0;
+    }
+
+    function showNotification(message) {
+        notification.textContent = message
+        notification.classList.add('show')
+        setTimeout(() => {
+            notification.classList.remove('show')
+        }, 3000)
+    }
+
+    function endGame(message) {
+        gameActive = false
+        gameStatus.textContent = message
+        gameStatus.classList.add('show')
+        clearInterval(timerInterval)
+        soundManager.play('gameEnd')
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval)
+        timerInterval = setInterval(() => {
+            if (currentPlayer === 'white') {
+                playerTime--
+                playerTimer.textContent = formatTime(playerTime)
+            } else {
+                opponentTime--
+                opponentTimer.textContent = formatTime(opponentTime)
+            }
+
+            if (playerTime <= 0 || opponentTime <= 0) {
+                endGame(`Time's up! ${playerTime <= 0 ? 'Black' : 'White'} wins!`)
+            }
+        }, 1000)
+    }
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60)
+        const remainingSeconds = seconds % 60
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+    }
+
+    function isValidMove(fromSquare, toSquare) {
+        const piece = fromSquare.textContent
+        const fromRow = parseInt(fromSquare.dataset.row)
+        const fromCol = parseInt(fromSquare.dataset.col)
+        const toRow = parseInt(toSquare.dataset.row)
+        const toCol = parseInt(toSquare.dataset.col)
+
+        // Can't move to a square with our own piece
+        if (isPieceOwnedByCurrentPlayer(toSquare.textContent)) {
+            return false
+        }
+
+        const rowDiff = Math.abs(toRow - fromRow)
+        const colDiff = Math.abs(toCol - fromCol)
+
+        switch (piece) {
+            case '♙': // White pawn
+                if (fromRow === 6) { // First move
+                    return (toRow === 4 && fromCol === toCol && !getPieceAt(5, fromCol) && !getPieceAt(4, fromCol)) ||
+                           (toRow === 5 && fromCol === toCol && !getPieceAt(5, fromCol)) ||
+                           (toRow === 5 && colDiff === 1 && getPieceAt(toRow, toCol) && !isPieceOwnedByCurrentPlayer(getPieceAt(toRow, toCol)))
+                }
+                return (toRow === fromRow - 1 && fromCol === toCol && !getPieceAt(toRow, toCol)) ||
+                       (toRow === fromRow - 1 && colDiff === 1 && getPieceAt(toRow, toCol) && !isPieceOwnedByCurrentPlayer(getPieceAt(toRow, toCol)))
+            
+            case '♟': // Black pawn
+                if (fromRow === 1) { // First move
+                    return (toRow === 3 && fromCol === toCol && !getPieceAt(2, fromCol) && !getPieceAt(3, fromCol)) ||
+                           (toRow === 2 && fromCol === toCol && !getPieceAt(2, fromCol)) ||
+                           (toRow === 2 && colDiff === 1 && getPieceAt(toRow, toCol) && !isPieceOwnedByCurrentPlayer(getPieceAt(toRow, toCol)))
+                }
+                return (toRow === fromRow + 1 && fromCol === toCol && !getPieceAt(toRow, toCol)) ||
+                       (toRow === fromRow + 1 && colDiff === 1 && getPieceAt(toRow, toCol) && !isPieceOwnedByCurrentPlayer(getPieceAt(toRow, toCol)))
+            
+            case '♖': case '♜': // Rook
+                return (fromRow === toRow || fromCol === toCol) && isPathClear(fromRow, fromCol, toRow, toCol)
+            
+            case '♘': case '♞': // Knight
+                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)
+            
+            case '♗': case '♝': // Bishop
+                return rowDiff === colDiff && isPathClear(fromRow, fromCol, toRow, toCol)
+            
+            case '♕': case '♛': // Queen
+                return (fromRow === toRow || fromCol === toCol || rowDiff === colDiff) && 
+                       isPathClear(fromRow, fromCol, toRow, toCol)
+            
+            case '♔': case '♚': // King
+                return rowDiff <= 1 && colDiff <= 1
         }
         return false
     }
 
-    function isOpponentPiece(piece, targetPiece) {
-        const isWhitePiece = piece.charCodeAt(0) >= 9812 && piece.charCodeAt(0) <= 9823
-        const isTargetWhitePiece = targetPiece.charCodeAt(0) >= 9812 && targetPiece.charCodeAt(0) <= 9823
-        return isWhitePiece !== isTargetWhitePiece
-    }
+    function isPathClear(fromRow, fromCol, toRow, toCol) {
+        const rowStep = toRow > fromRow ? 1 : toRow < fromRow ? -1 : 0
+        const colStep = toCol > fromCol ? 1 : toCol < fromCol ? -1 : 0
+        let currentRow = fromRow + rowStep
+        let currentCol = fromCol + colStep
 
-    function getSquareCoords(squareId) {
-        const parts = squareId.split('-')
-        return [parseInt(parts[1]), parseInt(parts[2])]
-    }
-
-    function isValidMove(piece, sourceCoords, targetCoords) {
-        const [sourceRow, sourceCol] = sourceCoords
-        const [targetRow, targetCol] = targetCoords
-        const rowDiff = Math.abs(targetRow - sourceRow)
-        const colDiff = Math.abs(targetCol - sourceCol)
-
-        switch (piece) {
-            case '♙': // White pawn
-                return (sourceRow === 6 && targetRow === 4 && colDiff === 0 && !squares[5][sourceCol].textContent && !squares[4][sourceCol].textContent) || // two squares forward from initial position
-                    (rowDiff === 1 && colDiff === 0 && targetRow < sourceRow && !squares[targetRow][targetCol].textContent) || // one square forward
-                    (rowDiff === 1 && colDiff === 1 && targetRow < sourceRow && isOpponentPiece(piece, squares[targetRow][targetCol].textContent)) // capture diagonally
-            case '♟': // Black pawn
-                return (sourceRow === 1 && targetRow === 3 && colDiff === 0 && !squares[2][sourceCol].textContent && !squares[3][sourceCol].textContent) || // two squares forward from initial position
-                    (rowDiff === 1 && colDiff === 0 && targetRow > sourceRow && !squares[targetRow][targetCol].textContent) || // one square forward
-                    (rowDiff === 1 && colDiff === 1 && targetRow > sourceRow && isOpponentPiece(piece, squares[targetRow][targetCol].textContent)) // capture diagonally
-            case '♜': // Rook
-            case '♖':
-                return (rowDiff === 0 || colDiff === 0) && isPathClear(sourceCoords, targetCoords)
-            case '♞': // Knight
-            case '♘':
-                return rowDiff * colDiff === 2
-            case '♝': // Bishop
-            case '♗':
-                return rowDiff === colDiff && isPathClear(sourceCoords, targetCoords)
-            case '♛': // Queen
-            case '♕':
-                return (rowDiff === colDiff || rowDiff === 0 || colDiff === 0) && isPathClear(sourceCoords, targetCoords)
-            case '♚': // King
-            case '♔':
-                return rowDiff <= 1 && colDiff <= 1
-            default:
+        while (currentRow !== toRow || currentCol !== toCol) {
+            if (getPieceAt(currentRow, currentCol)) {
                 return false
-        }
-    }
-
-    function isPathClear(sourceCoords, targetCoords) {
-        const [sourceRow, sourceCol] = sourceCoords
-        const [targetRow, targetCol] = targetCoords
-        const rowStep = targetRow > sourceRow ? 1 : (targetRow < sourceRow ? -1 : 0)
-        const colStep = targetCol > sourceCol ? 1 : (targetCol < sourceCol ? -1 : 0)
-        let row = sourceRow + rowStep
-        let col = sourceCol + colStep
-        while (row !== targetRow || col !== targetCol) {
-            if (squares[row][col].textContent) return false
-            row += rowStep
-            col += colStep
+            }
+            currentRow += rowStep
+            currentCol += colStep
         }
         return true
     }
 
-    function recordMove(sourceId, targetId, piece) {
-        const move = `${piece} from ${getSquareLabel(sourceId)} to ${getSquareLabel(targetId)}`
-        const listItem = document.createElement('li')
-        listItem.textContent = move
-        movesList.appendChild(listItem)
+    function movePiece(fromSquare, toSquare) {
+        const capturedPiece = toSquare.textContent;
+        const movingPiece = fromSquare.textContent;
+        
+        // Transfer the piece and its color data
+        toSquare.textContent = movingPiece;
+        toSquare.dataset.pieceColor = fromSquare.dataset.pieceColor;
+        
+        // Clear the source square
+        fromSquare.textContent = '';
+        delete fromSquare.dataset.pieceColor;
+        
+        if (capturedPiece) {
+            handleCapture(capturedPiece);
+        }
+        
+        return capturedPiece || null;
     }
 
-    function getSquareLabel(squareId) {
-        const parts = squareId.split('-')
-        const row = parseInt(parts[1])
-        const col = parseInt(parts[2])
-        const columns = 'abcdefgh'
-        return `${columns[col]}${8 - row}`
+    function isPieceOwnedByCurrentPlayer(piece) {
+        if (!piece) return false;
+        const isWhitePiece = '♔♕♖♗♘♙'.includes(piece);
+        const isBlackPiece = '♚♛♜♝♞♟'.includes(piece);
+        return (currentPlayer === 'white' && isWhitePiece) || 
+               (currentPlayer === 'black' && isBlackPiece);
     }
 
-    function isInCheck(player) {
-        const king = player === 'white' ? '♔' : '♚'
-        let kingCoords
-        outerLoop:
+    function getPieceAt(row, col) {
+        const square = document.querySelector(`[data-row="${row}"][data-col="${col}"]`)
+        return square ? square.textContent : null
+    }
+
+    function getSquare(row, col) {
+        return document.querySelector(`[data-row="${row}"][data-col="${col}"]`)
+    }
+
+    function getBoardState() {
+        const state = []
+        for (let i = 0; i < 8; i++) {
+            const row = []
+            for (let j = 0; j < 8; j++) {
+                row.push(getPieceAt(i, j) || '')
+            }
+            state.push(row)
+        }
+        return state
+    }
+
+    function loadGameState(gameState) {
+        // Clear the board first
+        board.innerHTML = '';
+        
+        // Load the board state
+        const boardState = gameState.board;
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                if (squares[i][j].textContent === king) {
-                    kingCoords = [i, j]
-                    break outerLoop
+                const square = document.createElement('div');
+                square.className = `square ${(i + j) % 2 === 0 ? 'white' : 'black'}`;
+                square.dataset.row = i;
+                square.dataset.col = j;
+                
+                const piece = boardState[i][j];
+                if (piece) {
+                    square.textContent = piece;
+                    // Set piece color based on the piece type, not position
+                    square.dataset.pieceColor = '♔♕♖♗♘♙'.includes(piece) ? 'white' : 'black';
+                }
+                
+                square.addEventListener('click', handleSquareClick);
+                board.appendChild(square);
+            }
+        }
+        
+        // Restore game state
+        currentPlayer = gameState.currentPlayer;
+        moveHistory = gameState.moveHistory || [];
+        capturedPieces = gameState.capturedPieces || { white: [], black: [] };
+        playerTime = gameState.playerTime || 600;
+        opponentTime = gameState.opponentTime || 600;
+        
+        // Update UI
+        updateTurnIndicator();
+        updateMoveHistory();
+        updateCapturedPieces();
+    }
+
+    function isCheck() {
+        // Find the current player's king
+        const kingSymbol = currentPlayer === 'white' ? '♔' : '♚'
+        let kingRow, kingCol
+
+        // Find king's position
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                if (getPieceAt(i, j) === kingSymbol) {
+                    kingRow = i
+                    kingCol = j
+                    break
+                }
+            }
+            if (kingRow !== undefined) break
+        }
+
+        // Check if any opponent's piece can capture the king
+        const currentPlayerBefore = currentPlayer
+        currentPlayer = currentPlayer === 'white' ? 'black' : 'white'
+
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                const piece = getPieceAt(i, j)
+                if (piece && isPieceOwnedByCurrentPlayer(piece)) {
+                    const fromSquare = getSquare(i, j)
+                    const toSquare = getSquare(kingRow, kingCol)
+                    if (isValidMove(fromSquare, toSquare)) {
+                        currentPlayer = currentPlayerBefore
+                        return true
+                    }
                 }
             }
         }
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                const piece = squares[i][j].textContent
-                if (piece && isOpponentPiece(king, piece) && isValidMove(piece, [i, j], kingCoords)) {
-                    return true
-                }
-            }
-        }
+
+        currentPlayer = currentPlayerBefore
         return false
     }
 
-    function isCheckmate(player) {
+    function isCheckmate() {
+        if (!isCheck()) return false
+
+        // Try all possible moves for the current player
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
-                const piece = squares[i][j].textContent
-                if (piece && isValidPiece(piece, player)) {
+                const piece = getPieceAt(i, j)
+                if (piece && isPieceOwnedByCurrentPlayer(piece)) {
+                    const fromSquare = getSquare(i, j)
+                    
+                    // Try moving to every square
                     for (let x = 0; x < 8; x++) {
                         for (let y = 0; y < 8; y++) {
-                            if (isValidDropTarget(squares[i][j], squares[x][y], piece, player)) {
-                                const originalTargetPiece = squares[x][y].textContent
-                                squares[x][y].textContent = piece
-                                squares[i][j].textContent = ''
-                                if (!isInCheck(player)) {
-                                    squares[i][j].textContent = piece
-                                    squares[x][y].textContent = originalTargetPiece
+                            const toSquare = getSquare(x, y)
+                            if (isValidMove(fromSquare, toSquare)) {
+                                // Make the move temporarily
+                                const capturedPiece = movePiece(fromSquare, toSquare)
+                                
+                                // Check if we're still in check
+                                const stillInCheck = isCheck()
+                                
+                                // Undo the move
+                                movePiece(toSquare, fromSquare)
+                                if (capturedPiece) {
+                                    toSquare.textContent = capturedPiece
+                                }
+                                
+                                // If this move gets us out of check, it's not checkmate
+                                if (!stillInCheck) {
                                     return false
                                 }
-                                squares[i][j].textContent = piece
-                                squares[x][y].textContent = originalTargetPiece
                             }
                         }
                     }
                 }
             }
         }
+        
+        // If we haven't found any valid moves, it's checkmate
         return true
     }
 
-    function highlightPossibleMoves(square) {
-        const piece = square.textContent
-        const [sourceRow, sourceCol] = getSquareCoords(square.id)
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                if (isValidMove(piece, [sourceRow, sourceCol], [i, j])) {
-                    squares[i][j].classList.add('highlight')
-                }
-            }
+    function updateMoveHistory() {
+        movesList.innerHTML = '';
+        moveHistory.forEach((move, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${index + 1}. ${move}`;
+            movesList.appendChild(li);
+        });
+    }
+
+    function updateCapturedPieces() {
+        capturedByPlayer.textContent = capturedPieces.black.join(' ')
+        capturedByOpponent.textContent = capturedPieces.white.join(' ')
+    }
+
+    function saveToLocalStorage() {
+        const gameState = {
+            board: getBoardState(),
+            currentPlayer,
+            moveHistory,
+            capturedPieces,
+            playerTime,
+            opponentTime,
+            lastSaved: new Date().toISOString()
+        };
+        localStorage.setItem('chessGameState', JSON.stringify(gameState));
+        showNotification('Game auto-saved locally');
+    }
+
+    function loadFromLocalStorage() {
+        const savedState = localStorage.getItem('chessGameState');
+        if (savedState) {
+            const gameState = JSON.parse(savedState);
+            loadGameState(gameState);
+            showNotification('Game restored from local storage');
+            return true;
         }
+        return false;
     }
 
-    function clearHighlights() {
-        for (let i = 0; i < 8; i++) {
-            for (let j = 0; j < 8; j++) {
-                squares[i][j].classList.remove('highlight')
-            }
+    // Initialize game
+    createBoard()
+
+    // Event listeners
+    resetButton.addEventListener('click', () => {
+        if (confirm('Start new game? Current game will be lost.')) {
+            // Clear local storage
+            localStorage.removeItem('chessGameState');
+            
+            // Reset board
+            createBoard();
+            clearSelection();
+            
+            // Reset game state
+            gameActive = true;
+            currentPlayer = 'black';
+            capturedPieces = { white: [], black: [] };
+            moveHistory = [];
+            playerTime = opponentTime = 600;
+            
+            // Clear UI elements
+            gameStatus.classList.remove('show');
+            capturedByPlayer.textContent = '';
+            capturedByOpponent.textContent = '';
+            movesList.innerHTML = ''; // Clear moves history display
+            
+            // Update UI
+            updateTurnIndicator();
+            soundManager.play('gameStart');
         }
-    }
-
-    function resetBoard() {
-        board.innerHTML = ''
-        movesList.innerHTML = ''
-        for (let i = 0; i < 8; i++) {
-            squares[i] = []
-            for (let j = 0; j < 8; j++) {
-                const square = createSquare(i, j, initialRows[i][j])
-                squares[i][j] = square
-                board.appendChild(square)
-            }
-        }
-        currentPlayer = 'black' // Start with black
-        resetTimer()
-    }
-
-    function resetTimer() {
-        clearInterval(timer)
-        timeRemaining = 600 // 10 minutes in seconds
-        updateTimerDisplay()
-        startTimer()
-    }
-
-    function startTimer() {
-        timer = setInterval(() => {
-            timeRemaining--
-            updateTimerDisplay()
-            if (timeRemaining <= 0) {
-                clearInterval(timer)
-                alert('Time\'s up! Game over.')
-            }
-        }, 1000)
-    }
-
-    function updateTimerDisplay() {
-        const minutes = Math.floor(timeRemaining / 60)
-        const seconds = timeRemaining % 60
-        timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
-    }
-
-    resetButton.addEventListener('click', resetBoard)
-
-    saveButton.addEventListener('click', () => {
-        const gameState = squares.map(row => row.map(square => square.textContent)).flat().join(',')
-        fetch('/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ state: gameState })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(`Game saved with ID: ${data.id}`)
-        })
-        .catch(error => {
-            console.error('Error saving game state:', error)
-        })
     })
 
-    loadButton.addEventListener('click', () => {
-        const gameId = gameIdInput.value
-        fetch(`/load/${gameId}`)
-        .then(response => response.json())
-        .then(data => {
-            const gameState = data.state.split(',')
-            for (let i = 0; i < 8; i++) {
-                for (let j = 0; j < 8; j++) {
-                    squares[i][j].textContent = gameState[i * 8 + j]
-                    squares[i][j].draggable = !!squares[i][j].textContent
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error loading game state:', error)
-        })
+    saveButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    state: JSON.stringify({
+                        board: getBoardState(),
+                        currentPlayer,
+                        moveHistory,
+                        capturedPieces,
+                        playerTime,
+                        opponentTime
+                    })
+                })
+            })
+            const data = await response.json()
+            showNotification(`Game saved! ID: ${data.id}`)
+            soundManager.play('notification')
+        } catch (err) {
+            showNotification('Error saving game')
+        }
     })
 
-    wagerForm.addEventListener('submit', function(event) {
-        event.preventDefault()
-        const wagerAmount = document.getElementById('wagerAmount').value
-        wagerStatus.textContent = `Wager placed: ${wagerAmount}`
-        // Emit wager event to the server
-        socket.emit('wager', { amount: wagerAmount })
+    loadButton.addEventListener('click', async () => {
+        const id = gameIdInput.value
+        if (!id) return
+
+        try {
+            const response = await fetch(`/load/${id}`)
+            const data = await response.json()
+            const gameState = JSON.parse(data.state)
+            loadGameState(gameState)
+            showNotification('Game loaded successfully')
+            soundManager.play('notification')
+        } catch (err) {
+            showNotification('Error loading game')
+        }
     })
 
+    wagerForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+        const amount = document.getElementById('wagerAmount').value
+        if (amount) {
+            socket.emit('wager', { amount, username: playerName })
+            showNotification(`Wager placed: $${amount}`)
+            soundManager.play('notification')
+        }
+    })
+
+    // Socket events
     socket.on('move', (data) => {
-        const { piece, sourceId, targetId } = data
-        const sourceSquare = document.getElementById(sourceId)
-        const targetSquare = document.getElementById(targetId)
-
-        targetSquare.textContent = piece
-        targetSquare.draggable = true
-        sourceSquare.textContent = ''
-        sourceSquare.draggable = false
-
-        recordMove(sourceId, targetId, piece)
-
-        currentPlayer = currentPlayer === 'white' ? 'black' : 'white'
+        const fromSquare = getSquare(data.from.row, data.from.col)
+        const toSquare = getSquare(data.to.row, data.to.col)
+        if (fromSquare && toSquare) {
+            const capturedPiece = movePiece(fromSquare, toSquare)
+            if (capturedPiece) {
+                handleCapture(capturedPiece)
+                soundManager.play('capture')
+            } else {
+                soundManager.play('move')
+            }
+            currentPlayer = currentPlayer === 'black' ? 'white' : 'black'
+            updateTurnIndicator()
+        }
     })
 
-    resetBoard()
-})
+    // Add auto-load on page load
+    if (!loadFromLocalStorage()) {
+        // If no saved game, start a new one
+        createBoard();
+    }
+});

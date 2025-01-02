@@ -1,0 +1,198 @@
+<%- include('../partials/header') %>
+
+<div class="analysis-container">
+    <div class="content-wrapper">
+        <div class="header-section">
+            <h1>Game Analysis</h1>
+            <div class="underline"></div>
+            <p class="subtitle">Improve your game with deep analysis</p>
+        </div>
+
+        <div class="coming-soon-section">
+            <div class="icon-container">
+                <i class="fas fa-chart-bar"></i>
+                <div class="pulse"></div>
+            </div>
+            <h2>Coming Soon</h2>
+            <p class="description">Analyze your games with powerful tools and AI assistance.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>Engine Analysis</h3>
+                    <p>Powered by advanced chess engines</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Mistake Detection</h3>
+                    <p>Find and learn from your mistakes</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-book"></i>
+                    <h3>Opening Explorer</h3>
+                    <p>Study and improve your openings</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-share-alt"></i>
+                    <h3>Share Analysis</h3>
+                    <p>Collaborate with friends and coaches</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.analysis-container {
+    min-height: calc(100vh - 60px);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 40px 20px;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.header-section h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #4a90e2, #3f51b5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.underline {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(45deg, #4a90e2, #3f51b5);
+    margin: 0 auto 20px;
+    border-radius: 2px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+}
+
+.coming-soon-section {
+    text-align: center;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.icon-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 30px;
+}
+
+.icon-container i {
+    font-size: 4rem;
+    color: #4a90e2;
+    position: relative;
+    z-index: 2;
+}
+
+.pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: rgba(74, 144, 226, 0.2);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.coming-soon-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #4a90e2, #3f51b5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.description {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature-card {
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #4a90e2, #3f51b5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.feature-card p {
+    color: #a0a0a0;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .header-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .coming-soon-section {
+        padding: 20px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<%- include('../partials/footer') %> 
