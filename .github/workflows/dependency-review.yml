@@ -1,8 +1,12 @@
 name: 'Dependency Review'
-on: [pull_request]
+
+on:
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   dependency-review:
@@ -10,5 +14,74 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v3
+
       - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v3 
+        uses: actions/dependency-review-action@v3
+        with:
+          fail-on-severity: critical
+          deny-licenses: AGPL-1.0-or-later, LGPL-2.0-or-later
+          comment-summary-in-pr: true
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: |
+          npm audit --json > audit.json || true
+          echo "Audit completed and saved to audit.json"
+      
+      - name: Process and Comment Audit Results
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const audit = JSON.parse(fs.readFileSync('audit.json', 'utf8'));
+            
+            let comment = '## NPM Security Audit Results\n\n';
+            
+            if (audit.vulnerabilities) {
+              const vulns = audit.vulnerabilities;
+              const severity = {
+                critical: 0,
+                high: 0,
+                moderate: 0,
+                low: 0
+              };
+              
+              Object.values(vulns).forEach(vuln => {
+                severity[vuln.severity]++;
+              });
+              
+              comment += '### Summary\n';
+              comment += '| Severity | Count |\n';
+              comment += '|----------|-------|\n';
+              Object.entries(severity).forEach(([level, count]) => {
+                if (count > 0) {
+                  comment += `| ${level} | ${count} |\n`;
+                }
+              });
+              
+              if (severity.critical > 0 || severity.high > 0) {
+                comment += '\n⚠️ **Action Required**: Critical or High severity vulnerabilities found!\n';
+              }
+            } else {
+              comment += '✅ No vulnerabilities found!\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            }); 
