@@ -68,10 +68,10 @@ class BotGame {
         
         // Update UI with bot information
         $('.player-info.black .player-name').text(selectedBot.name);
-        $('.player-info.black .player-rating').text(Elo: ${selectedBot.rating});
+        $('.player-info.black .player-rating').text(`Elo: ${selectedBot.rating}`);
         $('.bot-info-panel .personality').text(selectedBot.personality);
         $('.bot-info-panel .style').text(selectedBot.style);
-        $('.bot-info-panel .thinking-time').text(${selectedBot.thinkingTime}s);
+        $('.bot-info-panel .thinking-time').text(`${selectedBot.thinkingTime}s`);
         
         $('#botSelectionModal').modal('hide');
         
@@ -307,6 +307,13 @@ class BotGame {
 }
 
 // Initialize the game when the document is ready
-$(document).ready(() => {
-    window.botGame = new BotGame();
-}); 
+if (typeof window !== 'undefined') {
+    $(document).ready(() => {
+        window.botGame = new BotGame();
+    });
+}
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = BotGame;
+} 

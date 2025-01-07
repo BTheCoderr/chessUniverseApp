@@ -1,0 +1,40 @@
+{
+  "name": "@chess-universe/utils",
+  "version": "1.0.0",
+  "description": "Chess Universe utility functions and reusable components",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "babel src -d dist",
+    "test": "jest",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "chess",
+    "utilities",
+    "game",
+    "analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chess.js": "^1.0.0-beta.7"
+  },
+  "peerDependencies": {
+    "jquery": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+} 
