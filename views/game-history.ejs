@@ -1,0 +1,200 @@
+<%- include('partials/header') %>
+
+<div class="game-history-container">
+    <h1>Game History</h1>
+    
+    <div class="filters">
+        <select id="timeControl" onchange="filterGames()">
+            <option value="all">All Time Controls</option>
+            <option value="blitz">Blitz</option>
+            <option value="rapid">Rapid</option>
+            <option value="classical">Classical</option>
+        </select>
+        
+        <select id="result" onchange="filterGames()">
+            <option value="all">All Results</option>
+            <option value="win">Wins</option>
+            <option value="loss">Losses</option>
+            <option value="draw">Draws</option>
+        </select>
+    </div>
+
+    <div class="games-list">
+        <% games.forEach(game => { %>
+            <div class="game-card">
+                <div class="game-header">
+                    <div class="game-info">
+                        <span class="date"><%= new Date(game.date).toLocaleDateString() %></span>
+                        <span class="time-control"><%= game.timeControl.initial/60 %>+<%= game.timeControl.increment %></span>
+                    </div>
+                    <div class="result <%= game.result.toLowerCase() %>">
+                        <%= game.result %>
+                    </div>
+                </div>
+
+                <div class="players">
+                    <div class="white-player">
+                        <span class="name"><%= game.white %></span>
+                        <span class="rating">(<%= game.whiteElo %>)</span>
+                    </div>
+                    <div class="vs">vs</div>
+                    <div class="black-player">
+                        <span class="name"><%= game.black %></span>
+                        <span class="rating">(<%= game.blackElo %>)</span>
+                    </div>
+                </div>
+
+                <div class="game-footer">
+                    <div class="moves-count">
+                        <%= game.moves.length %> moves
+                    </div>
+                    <div class="actions">
+                        <button onclick="replayGame('<%= game._id %>')" class="action-btn replay">
+                            <i class="fas fa-play"></i> Replay
+                        </button>
+                        <button onclick="analyzeGame('<%= game._id %>')" class="action-btn analyze">
+                            <i class="fas fa-chart-line"></i> Analyze
+                        </button>
+                        <button onclick="downloadPGN('<%= game._id %>')" class="action-btn download">
+                            <i class="fas fa-download"></i> PGN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<style>
+.game-history-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.filters select {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}
+
+.game-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.game-info {
+    display: flex;
+    gap: 1rem;
+    color: #a0aec0;
+}
+
+.result {
+    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+}
+
+.result.win { background: rgba(72, 187, 120, 0.2); color: #48bb78; }
+.result.loss { background: rgba(245, 101, 101, 0.2); color: #f56565; }
+.result.draw { background: rgba(237, 137, 54, 0.2); color: #ed8936; }
+
+.players {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.white-player, .black-player {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.rating {
+    color: #a0aec0;
+}
+
+.vs {
+    color: #a0aec0;
+}
+
+.game-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.moves-count {
+    color: #a0aec0;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.action-btn i {
+    font-size: 0.9em;
+}
+
+.replay { color: #48bb78; }
+.analyze { color: #4299e1; }
+.download { color: #ed8936; }
+</style>
+
+<script>
+function downloadPGN(gameId) {
+    window.location.href = `/api/games/${gameId}/pgn`;
+}
+
+function replayGame(gameId) {
+    window.location.href = `/game/replay/${gameId}`;
+}
+
+function analyzeGame(gameId) {
+    window.location.href = `/analysis/${gameId}`;
+}
+
+function filterGames() {
+    const timeControl = document.getElementById('timeControl').value;
+    const result = document.getElementById('result').value;
+    window.location.href = `/history?timeControl=${timeControl}&result=${result}`;
+}
+</script>
+
+<%- include('partials/footer') %> 

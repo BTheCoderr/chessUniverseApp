@@ -1,0 +1,424 @@
+<%- include('partials/header') %>
+
+<div class="container mt-4">
+    <h2>Leaderboard</h2>
+
+    <div class="filters mb-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="timeControl" class="form-label">Time Control</label>
+                <select id="timeControl" class="form-select" onchange="filterLeaderboard()">
+                    <option value="">All Time Controls</option>
+                    <option value="bullet" <%= filters.timeControl === 'bullet' ? 'selected' : '' %>>Bullet</option>
+                    <option value="blitz" <%= filters.timeControl === 'blitz' ? 'selected' : '' %>>Blitz</option>
+                    <option value="rapid" <%= filters.timeControl === 'rapid' ? 'selected' : '' %>>Rapid</option>
+                    <option value="classical" <%= filters.timeControl === 'classical' ? 'selected' : '' %>>Classical</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4">
+                <label for="region" class="form-label">Region</label>
+                <select id="region" class="form-select" onchange="filterLeaderboard()">
+                    <option value="">All Regions</option>
+                    <option value="NA" <%= filters.region === 'NA' ? 'selected' : '' %>>North America</option>
+                    <option value="EU" <%= filters.region === 'EU' ? 'selected' : '' %>>Europe</option>
+                    <option value="AS" <%= filters.region === 'AS' ? 'selected' : '' %>>Asia</option>
+                    <option value="SA" <%= filters.region === 'SA' ? 'selected' : '' %>>South America</option>
+                    <option value="AF" <%= filters.region === 'AF' ? 'selected' : '' %>>Africa</option>
+                    <option value="OC" <%= filters.region === 'OC' ? 'selected' : '' %>>Oceania</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Players Podium -->
+    <div class="top-players mb-4">
+        <div class="podium">
+            <% if (leaderboard.length > 1) { %>
+                <div class="podium-spot second">
+                    <div class="player-card">
+                        <div class="player-avatar">
+                            <img src="/img/avatars/default.png" alt="Second Place">
+                        </div>
+                        <div class="player-info">
+                            <div class="player-name"><%= leaderboard[1].username %></div>
+                            <div class="player-rating">
+                                <%= filters.timeControl ? leaderboard[1].ratings[filters.timeControl] : 
+                                    Math.max(
+                                        leaderboard[1].ratings.bullet || 0,
+                                        leaderboard[1].ratings.blitz || 0,
+                                        leaderboard[1].ratings.rapid || 0,
+                                        leaderboard[1].ratings.classical || 0
+                                    )
+                                %>
+                            </div>
+                            <div class="position">2</div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (leaderboard.length > 0) { %>
+                <div class="podium-spot first">
+                    <i class="bi bi-trophy-fill crown"></i>
+                    <div class="player-card">
+                        <div class="player-avatar">
+                            <img src="/img/avatars/default.png" alt="First Place">
+                        </div>
+                        <div class="player-info">
+                            <div class="player-name"><%= leaderboard[0].username %></div>
+                            <div class="player-rating">
+                                <%= filters.timeControl ? leaderboard[0].ratings[filters.timeControl] : 
+                                    Math.max(
+                                        leaderboard[0].ratings.bullet || 0,
+                                        leaderboard[0].ratings.blitz || 0,
+                                        leaderboard[0].ratings.rapid || 0,
+                                        leaderboard[0].ratings.classical || 0
+                                    )
+                                %>
+                            </div>
+                            <div class="position">1</div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (leaderboard.length > 2) { %>
+                <div class="podium-spot third">
+                    <div class="player-card">
+                        <div class="player-avatar">
+                            <img src="/img/avatars/default.png" alt="Third Place">
+                        </div>
+                        <div class="player-info">
+                            <div class="player-name"><%= leaderboard[2].username %></div>
+                            <div class="player-rating">
+                                <%= filters.timeControl ? leaderboard[2].ratings[filters.timeControl] : 
+                                    Math.max(
+                                        leaderboard[2].ratings.bullet || 0,
+                                        leaderboard[2].ratings.blitz || 0,
+                                        leaderboard[2].ratings.rapid || 0,
+                                        leaderboard[2].ratings.classical || 0
+                                    )
+                                %>
+                            </div>
+                            <div class="position">3</div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Region</th>
+                    <th class="text-end">Rating</th>
+                    <th class="text-end">Games</th>
+                    <th class="text-end">Win Rate</th>
+                    <th class="text-end">Peak Rating</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+                <% leaderboard.forEach((player, index) => { %>
+                    <tr class="<%= player.username === currentUser?.username ? 'table-primary' : '' %>">
+                        <td><%= index + 1 %></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="/img/avatars/default.png" alt="Avatar" class="player-avatar-small">
+                                <a href="/profile/<%= player.username %>" class="text-decoration-none">
+                                    <%= player.username %>
+                                </a>
+                                <% if (player.region === userRegion) { %>
+                                    <span class="badge bg-success">Local</span>
+                                <% } %>
+                            </div>
+                        </td>
+                        <td>
+                            <img src="/img/flags/<%= player.region.toLowerCase() %>.png" 
+                                 alt="<%= player.region %>" 
+                                 title="<%= player.region %>"
+                                 class="region-flag">
+                            <%= player.region %>
+                        </td>
+                        <td class="text-end">
+                            <% if (filters.timeControl) { %>
+                                <%= player.ratings[filters.timeControl] %>
+                            <% } else { %>
+                                <div>Bullet: <%= player.ratings.bullet %></div>
+                                <div>Blitz: <%= player.ratings.blitz %></div>
+                                <div>Rapid: <%= player.ratings.rapid %></div>
+                                <div>Classical: <%= player.ratings.classical %></div>
+                            <% } %>
+                        </td>
+                        <td class="text-end">
+                            <% if (filters.timeControl) { %>
+                                <%= player.games[filters.timeControl] %>
+                            <% } else { %>
+                                <div>Bullet: <%= player.games.bullet %></div>
+                                <div>Blitz: <%= player.games.blitz %></div>
+                                <div>Rapid: <%= player.games.rapid %></div>
+                                <div>Classical: <%= player.games.classical %></div>
+                            <% } %>
+                        </td>
+                        <td class="text-end">
+                            <% if (filters.timeControl) { %>
+                                <%= player.winRates[filters.timeControl] %>
+                            <% } else { %>
+                                <div>Bullet: <%= player.winRates.bullet %></div>
+                                <div>Blitz: <%= player.winRates.blitz %></div>
+                                <div>Rapid: <%= player.winRates.rapid %></div>
+                                <div>Classical: <%= player.winRates.classical %></div>
+                            <% } %>
+                        </td>
+                        <td class="text-end">
+                            <% if (filters.timeControl) { %>
+                                <%= player.ratings[filters.timeControl] %>
+                            <% } else { %>
+                                <%= Math.max(
+                                    player.ratings.bullet || 0,
+                                    player.ratings.blitz || 0,
+                                    player.ratings.rapid || 0,
+                                    player.ratings.classical || 0
+                                ) %>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+/* Podium Styles */
+.top-players {
+    margin-bottom: 3rem;
+}
+
+.podium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.podium-spot {
+    position: relative;
+    text-align: center;
+}
+
+.podium-spot.first {
+    margin-bottom: 0;
+}
+
+.podium-spot.second {
+    margin-bottom: -20px;
+}
+
+.podium-spot.third {
+    margin-bottom: -40px;
+}
+
+.crown {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: gold;
+    font-size: 2rem;
+}
+
+.player-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.player-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1rem;
+    border: 3px solid;
+}
+
+.first .player-avatar { border-color: gold; }
+.second .player-avatar { border-color: silver; }
+.third .player-avatar { border-color: #cd7f32; }
+
+.player-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.player-info {
+    color: #333;
+}
+
+.player-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.player-rating {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.position {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+}
+
+.first .position { color: gold; }
+.second .position { color: silver; }
+.third .position { color: #cd7f32; }
+
+/* Table Styles */
+.table {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.player-avatar-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.region-flag {
+    width: 20px;
+    height: 15px;
+    margin-right: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .podium {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .podium-spot {
+        margin-bottom: 0 !important;
+    }
+
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+    }
+}
+</style>
+
+<script>
+function filterLeaderboard() {
+    const timeControl = document.getElementById('timeControl').value;
+    const region = document.getElementById('region').value;
+    
+    // Build query string
+    const params = new URLSearchParams();
+    if (timeControl) params.append('timeControl', timeControl);
+    if (region) params.append('region', region);
+    
+    // Update URL without reloading
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+    
+    // Fetch filtered data
+    fetch(`/leaderboard?${params.toString()}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Update podium
+        updatePodium(data);
+        // Update table
+        updateTable(data, timeControl);
+    })
+    .catch(error => {
+        console.error('Error fetching leaderboard:', error);
+    });
+}
+
+function updatePodium(data) {
+    // Implementation of podium update
+    // This will be called when filtering to update the top 3 display
+}
+
+function updateTable(data, timeControl) {
+    const tbody = document.getElementById('leaderboardBody');
+    tbody.innerHTML = data.map((player, index) => `
+        <tr class="${player.username === window.currentUser?.username ? 'table-primary' : ''}">
+            <td>${index + 1}</td>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <img src="/img/avatars/default.png" alt="Avatar" class="player-avatar-small">
+                    <a href="/profile/${player.username}" class="text-decoration-none">
+                        ${player.username}
+                    </a>
+                    ${player.region === window.userRegion ? '<span class="badge bg-success">Local</span>' : ''}
+                </div>
+            </td>
+            <td>
+                <img src="/img/flags/${player.region.toLowerCase()}.png" 
+                     alt="${player.region}" 
+                     title="${player.region}"
+                     class="region-flag">
+                ${player.region}
+            </td>
+            <td class="text-end">
+                ${timeControl ? player.ratings[timeControl] : `
+                    <div>Bullet: ${player.ratings.bullet}</div>
+                    <div>Blitz: ${player.ratings.blitz}</div>
+                    <div>Rapid: ${player.ratings.rapid}</div>
+                    <div>Classical: ${player.ratings.classical}</div>
+                `}
+            </td>
+            <td class="text-end">
+                ${timeControl ? player.games[timeControl] : `
+                    <div>Bullet: ${player.games.bullet}</div>
+                    <div>Blitz: ${player.games.blitz}</div>
+                    <div>Rapid: ${player.games.rapid}</div>
+                    <div>Classical: ${player.games.classical}</div>
+                `}
+            </td>
+            <td class="text-end">
+                ${timeControl ? player.winRates[timeControl] : `
+                    <div>Bullet: ${player.winRates.bullet}</div>
+                    <div>Blitz: ${player.winRates.blitz}</div>
+                    <div>Rapid: ${player.winRates.rapid}</div>
+                    <div>Classical: ${player.winRates.classical}</div>
+                `}
+            </td>
+            <td class="text-end">
+                ${timeControl ? player.ratings[timeControl] : Math.max(
+                    player.ratings.bullet || 0,
+                    player.ratings.blitz || 0,
+                    player.ratings.rapid || 0,
+                    player.ratings.classical || 0
+                )}
+            </td>
+        </tr>
+    `).join('');
+}
+</script>
+
+<%- include('partials/footer') %> 

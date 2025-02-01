@@ -1,0 +1,74 @@
+<%- include('partials/header') %>
+
+<div class="legal-container">
+    <h1>Terms of Service</h1>
+    <p>Last updated: <%= new Date().toISOString().split('T')[0] %></p>
+
+    <section>
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing and using Chess Universe, you accept and agree to be bound by these Terms of Service.</p>
+    </section>
+
+    <section>
+        <h2>2. User Conduct</h2>
+        <p>You agree to:</p>
+        <ul>
+            <li>Play fairly and not use automated tools or cheating methods</li>
+            <li>Maintain appropriate behavior in chat and communications</li>
+            <li>Not interfere with other users' gameplay experience</li>
+            <li>Not exploit bugs or glitches in the system</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>3. Account Security</h2>
+        <p>You are responsible for maintaining the security of your account and any activities that occur under your account.</p>
+    </section>
+
+    <section>
+        <h2>4. Fair Play</h2>
+        <p>Chess Universe maintains a strict fair play policy. Use of chess engines, tablebases, or any external assistance during games is prohibited.</p>
+    </section>
+
+    <section>
+        <h2>5. Termination</h2>
+        <p>We reserve the right to terminate or suspend access to our service immediately, without prior notice, for any violation of these Terms.</p>
+    </section>
+
+    <section>
+        <h2>6. Changes to Terms</h2>
+        <p>We reserve the right to modify these terms at any time. Continued use of the service constitutes acceptance of new terms.</p>
+    </section>
+</div>
+
+<style>
+.legal-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    color: #e2e8f0;
+}
+
+.legal-container h1 {
+    font-size: 2em;
+    margin-bottom: 1rem;
+}
+
+.legal-container h2 {
+    font-size: 1.5em;
+    margin: 2rem 0 1rem;
+}
+
+.legal-container ul {
+    list-style: disc;
+    margin-left: 2rem;
+}
+
+.legal-container li {
+    margin: 0.5rem 0;
+}
+</style>
+
+<%- include('partials/footer') %> 
